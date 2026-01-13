@@ -34,7 +34,7 @@ export function LoginScreen({ onLogin }) {
 
       <div className="w-full max-w-md relative z-10">
         {/* Header Section */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 bg-white/60 backdrop-blur-md rounded-2xl p-6 border-[5px] border-black shadow-lg">
           <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 rounded-3xl mb-6 shadow-2xl shadow-blue-500/40 transform hover:scale-105 transition-all duration-300 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent"></div>
             <Activity className="w-12 h-12 text-white relative z-10" strokeWidth={2.5} />
@@ -46,14 +46,14 @@ export function LoginScreen({ onLogin }) {
         </div>
 
         {/* Login Card */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl shadow-gray-500/10 p-8 border border-gray-100">
-          <div className="mb-8">
+        <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl shadow-gray-500/10 p-8 border-[5px] border-black hover:border-black hover:shadow-[0_20px_50px_rgba(37,99,235,0.15)] transition-all duration-300 hover:scale-[1.01]">
+          <div className="mb-8 pb-6 border-b-[5px] border-black">
             <h2 className="text-gray-900 text-2xl font-bold mb-1">Welcome back</h2>
             <p className="text-gray-500 text-sm">Sign in to continue to your account</p>
           </div>
           
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Username Input */}
+          <form onSubmit={handleSubmit} className="space-y-6">            {/* Credentials Section */}
+            <div className="space-y-5 p-5 bg-gray-50/50 rounded-xl border-[5px] border-black">            {/* Username Input */}
             <div>
               <label htmlFor="username" className="block text-gray-700 text-sm font-semibold mb-2.5">
                 Username
@@ -70,7 +70,7 @@ export function LoginScreen({ onLogin }) {
                   onFocus={() => setFocusedInput('username')}
                   onBlur={() => setFocusedInput(null)}
                   placeholder="Enter your username"
-                  className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-gray-900 placeholder-gray-400 font-medium"
+                  className="w-full pl-12 pr-4 py-3.5 border-[5px] border-black rounded-xl focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-gray-900 placeholder-gray-400 font-medium"
                 />
               </div>
             </div>
@@ -92,13 +92,14 @@ export function LoginScreen({ onLogin }) {
                   onFocus={() => setFocusedInput('password')}
                   onBlur={() => setFocusedInput(null)}
                   placeholder="Enter your password"
-                  className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-gray-900 placeholder-gray-400 font-medium"
+                  className="w-full pl-12 pr-4 py-3.5 border-[5px] border-black rounded-xl focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-gray-900 placeholder-gray-400 font-medium"
                 />
               </div>
             </div>
+            </div>
 
             {/* Role Selection */}
-            <div>
+            <div className="p-5 bg-blue-50/30 rounded-xl border-[5px] border-black">
               <label className="block text-gray-700 text-sm font-semibold mb-3">Select Role</label>
               <div className="grid grid-cols-2 gap-3">
                 {[
@@ -111,10 +112,10 @@ export function LoginScreen({ onLogin }) {
                     key={role.value}
                     type="button"
                     onClick={() => setSelectedRole(role.value)}
-                    className={`py-3.5 px-4 rounded-xl border-2 transition-all duration-200 font-semibold text-sm flex items-center justify-center gap-2 ${
+                    className={`py-3.5 px-4 rounded-xl border-[5px] transition-all duration-200 font-semibold text-sm flex items-center justify-center gap-2 ${
                       selectedRole === role.value
-                        ? 'border-blue-600 bg-gradient-to-br from-blue-50 to-blue-100 text-blue-700 shadow-md shadow-blue-200/50 scale-105'
-                        : 'border-gray-200 bg-white text-gray-700 hover:border-blue-300 hover:bg-gray-50 hover:scale-102'
+                        ? 'border-black bg-gradient-to-br from-blue-50 to-blue-100 text-blue-700 shadow-md shadow-blue-200/50 scale-105'
+                        : 'border-black bg-white text-gray-700 hover:border-black hover:bg-gray-50 hover:scale-102'
                     }`}
                   >
                     <span className="text-lg">{roleIcons[role.value]}</span>
@@ -125,16 +126,18 @@ export function LoginScreen({ onLogin }) {
             </div>
 
             {/* Sign In Button */}
+            <div className="pt-6 border-t-[5px] border-black">
             <button
               type="submit"
               className="w-full py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-all duration-200 font-semibold text-base shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
             >
               Sign In
             </button>
+            </div>
           </form>
 
           {/* Additional Options */}
-          <div className="mt-6 flex items-center justify-between text-sm">
+          <div className="mt-6 pt-6 flex items-center justify-between text-sm border-t-[5px] border-black">
             <a href="#" className="text-gray-500 hover:text-blue-600 transition-colors font-medium">
               Forgot password?
             </a>
