@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Activity, Lock, User as UserIcon, Stethoscope } from 'lucide-react';
+import { Activity, Lock, User as UserIcon } from 'lucide-react';
 
 export function LoginScreen({ onLogin }) {
   const [username, setUsername] = useState('');
@@ -32,9 +32,17 @@ export function LoginScreen({ onLogin }) {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="w-full max-w-md relative z-10">
+      <div className="border w-full max-w-md relative z-10">
         {/* Header Section */}
         <div className="text-center mb-8 bg-white/60 backdrop-blur-md rounded-2xl p-6 border-[5px] border-black shadow-lg">
+          {/* Logo */}
+          <div className="flex justify-center mb-4">
+            <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' className="w-16 h-16 drop-shadow-lg">
+              <rect width='100' height='100' rx='20' fill='%232563eb'/>
+              <path d='M30 50 L45 35 L60 50 L75 35' stroke='white' strokeWidth='6' fill='none' strokeLinecap='round' strokeLinejoin='round'/>
+              <circle cx='50' cy='65' r='4' fill='white'/>
+            </svg>
+          </div>
           <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 rounded-3xl mb-6 shadow-2xl shadow-blue-500/40 transform hover:scale-105 transition-all duration-300 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent"></div>
             <Activity className="w-12 h-12 text-white relative z-10" strokeWidth={2.5} />
@@ -138,12 +146,12 @@ export function LoginScreen({ onLogin }) {
 
           {/* Additional Options */}
           <div className="mt-6 pt-6 flex items-center justify-between text-sm border-t-[5px] border-black">
-            <a href="#" className="text-gray-500 hover:text-blue-600 transition-colors font-medium">
+            <button className="text-gray-500 hover:text-blue-600 transition-colors font-medium" onClick={(e) => e.preventDefault()}>
               Forgot password?
-            </a>
-            <a href="#" className="text-blue-600 hover:text-blue-700 transition-colors font-semibold">
+            </button>
+            <button className="text-blue-600 hover:text-blue-700 transition-colors font-semibold" onClick={(e) => e.preventDefault()}>
               Need help?
-            </a>
+            </button>
           </div>
         </div>
 
@@ -156,37 +164,51 @@ export function LoginScreen({ onLogin }) {
             Secure • Compliant • Trusted
           </p>
         </div>
-      </div>
 
-      {/* Custom CSS for animations */}
-      <style jsx>{`
-        @keyframes blob {
-          0% {
-            transform: translate(0px, 0px) scale(1);
+        {/* Custom CSS for animations */}
+        <style jsx>{`
+          @keyframes blob {
+            0% {
+              transform: translate(0px, 0px) scale(1);
+            }
+            33% {
+              transform: translate(30px, -50px) scale(1.1);
+            }
+            66% {
+              transform: translate(-20px, 20px) scale(0.9);
+            }
+            100% {
+              transform: translate(0px, 0px) scale(1);
+            }
           }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
+          .animate-blob {
+            animation: blob 7s infinite;
           }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
+          .animation-delay-2000 {
+            animation-delay: 2s;
           }
-          100% {
-            transform: translate(0px, 0px) scale(1);
+          .animation-delay-4000 {
+            animation-delay: 4s;
           }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-        .hover\:scale-102:hover {
-          transform: scale(1.02);
-        }
-      `}</style>
+          .hoverscale102:hover {
+            transform: scale(1.02);
+          }
+          .border {
+            border-radius: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 60px rgba(59, 130, 246, 0.1);
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            transform: translateY(0px);
+          }
+          .border:hover {
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2), 0 0 80px rgba(59, 130, 246, 0.15);
+            transform: translateY(-5px);
+          }
+        `}</style>
+      </div>
     </div>
   );
 }
