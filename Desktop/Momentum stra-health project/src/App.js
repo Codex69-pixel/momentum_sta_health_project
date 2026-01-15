@@ -6,11 +6,13 @@ import { ResourceDashboard } from './components/ResourceDashboard';
 import { DoctorPortal } from './components/DoctorPortal';
 import { InventoryManagement } from './components/InventoryManagement';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
-import { Navigation } from './components/Navigation';
+import { TopBar } from './components/TopBar';
+import { Sidebar } from './components/Sidebar';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState('login');
   const [user, setUser] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogin = (userData) => {
     setUser(userData);
@@ -36,14 +38,18 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation 
-        currentScreen={currentScreen} 
+      <TopBar onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+      
+      <Sidebar 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        currentScreen={currentScreen}
         onNavigate={setCurrentScreen}
         user={user}
         onLogout={handleLogout}
       />
       
-      <main className="pt-16">
+      <main className="pt-16 w-full overflow-auto">
         {currentScreen === 'nurse' && <NurseTriage />}
         {currentScreen === 'queue' && <QueueManagement />}
         {currentScreen === 'resources' && <ResourceDashboard />}
