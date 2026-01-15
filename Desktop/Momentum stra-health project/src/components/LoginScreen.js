@@ -32,7 +32,7 @@ export function LoginScreen({ onLogin }) {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="border w-full max-w-md relative z-10">
+      <div className="login-border w-full max-w-md relative z-10">
         {/* Header Section */}
         <div className="text-center mb-8 bg-white/60 backdrop-blur-md rounded-2xl p-6 border-[5px] border-black shadow-lg">
           {/* Logo */}
@@ -165,8 +165,8 @@ export function LoginScreen({ onLogin }) {
           </p>
         </div>
 
-        {/* Custom CSS for animations */}
-        <style jsx>{`
+        {/* Custom CSS for animations - Using inline styles to avoid styled-jsx issues */}
+        <style>{`
           @keyframes blob {
             0% {
               transform: translate(0px, 0px) scale(1);
@@ -193,7 +193,7 @@ export function LoginScreen({ onLogin }) {
           .hoverscale102:hover {
             transform: scale(1.02);
           }
-          .border {
+          .login-border {
             border-radius: 2rem;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 0 60px rgba(59, 130, 246, 0.1);
             padding: 2rem;
@@ -203,7 +203,7 @@ export function LoginScreen({ onLogin }) {
             transition: all 0.3s ease;
             transform: translateY(0px);
           }
-          .border:hover {
+          .login-border:hover {
             box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2), 0 0 80px rgba(59, 130, 246, 0.15);
             transform: translateY(-5px);
           }
