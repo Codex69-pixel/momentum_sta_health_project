@@ -28,15 +28,6 @@ const mockQueues = [
 ];
 
 export function QueueManagement() {
-  const getStatusInfo = (status) => {
-    switch (status) {
-      case 'IN_PROGRESS': return { color: 'text-blue-600', label: 'In Progress' };
-      case 'WAITING': return { color: 'text-gray-600', label: 'Waiting' };
-      case 'COMPLETED': return { color: 'text-green-600', label: 'Completed' };
-      default: return { color: 'text-gray-600', label: 'Unknown' };
-    }
-  };
-
   const getUrgencyColor = (urgency) => {
     switch (urgency) {
       case 'RED': return 'bg-red-100 text-red-700';
@@ -129,10 +120,8 @@ export function QueueManagement() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {queue.patients.map((patient) => {
-                    const statusInfo = getStatusInfo(patient.status);
-                    return (
-                      <tr key={patient.id} className="hover:bg-gray-50">
+                  {queue.patients.map((patient) => (
+                    <tr key={patient.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4">
                           <span className="text-gray-900 font-semibold">{patient.position}</span>
                         </td>
@@ -152,13 +141,21 @@ export function QueueManagement() {
                           {patient.waitTime} min
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`flex items-center ${statusInfo.color}`}>
-                            {statusInfo.label}
-                          </span>
+                          <select
+                            value={patient.status}
+                            onChange={(e) => {
+                              // Handle status change
+                              console.log(`Changed ${patient.id} status to ${e.target.value}`);
+                            }}
+                            className="px-2 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="WAITING">Waiting</option>
+                            <option value="IN_PROGRESS">In Progress</option>
+                            <option value="COMPLETED">Completed</option>
+                          </select>
                         </td>
                       </tr>
-                    );
-                  })}
+                  ))}
                 </tbody>
               </table>
             </div>

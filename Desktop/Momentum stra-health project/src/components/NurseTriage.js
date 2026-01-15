@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Phone, Calendar, Heart, Thermometer, Activity, Droplet, Wind, AlertCircle, Save, FileText, Pill, TestTube, MapPin, Mail, CheckCircle, XCircle } from 'lucide-react';
+import { User, Phone, Heart, Activity, Save, FileText, Pill, TestTube, Mail, CheckCircle, XCircle } from 'lucide-react';
 
 export function NurseTriage() {
   const [step, setStep] = useState(1);
@@ -134,33 +134,6 @@ export function NurseTriage() {
     });
   };
 
-  const calculateTriageScore = () => {
-    let score = 0;
-    const pulse = parseInt(formData.pulseRate);
-    const bpSystolic = parseInt(formData.bloodPressureSystolic);
-    
-    if (pulse < 40 || pulse > 131) score += 2;
-    else if ((pulse >= 40 && pulse <= 50) || (pulse >= 111 && pulse <= 130)) score += 1;
-    
-    if (bpSystolic < 90 || bpSystolic > 220) score += 3;
-    else if ((bpSystolic >= 90 && bpSystolic <= 100) || (bpSystolic >= 180 && bpSystolic <= 220)) score += 2;
-    
-    return score;
-  };
-
-  const getUrgencyLevel = (score) => {
-    if (score >= 7) return { level: 'CRITICAL', color: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-300' };
-    if (score >= 5) return { level: 'HIGH', color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-300' };
-    if (score >= 3) return { level: 'MEDIUM', color: 'text-yellow-600', bgColor: 'bg-yellow-50', borderColor: 'border-yellow-300' };
-    return { level: 'LOW', color: 'text-green-600', bgColor: 'bg-green-50', borderColor: 'border-green-300' };
-  };
-
-  const symptomsList = [
-    'Fever', 'Cough', 'Headache', 'Body Aches', 'Fatigue',
-    'Shortness of Breath', 'Chest Pain', 'Nausea', 'Vomiting',
-    'Diarrhea', 'Abdominal Pain', 'Dizziness', 'Skin Rash'
-  ];
-
   const handleSubmit = () => {
     const straId = `STRA-${Date.now().toString().slice(-8)}`;
     const dateOfBirth = `${formData.birthDay}/${formData.birthMonth}/${formData.birthYear}`;
@@ -173,6 +146,15 @@ export function NurseTriage() {
   };
 
   const totalSteps = 7;
+  const stepTitles = [
+    'Patient Information',
+    'Medical History',
+    'Personal Medical History',
+    'Vital Signs',
+    'Immunizations',
+    'Physical Exam',
+    'Review & Submit'
+  ];
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -815,36 +797,50 @@ export function NurseTriage() {
           )}
         </div>
 
-        {/* Navigation Buttons */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50 flex justify-between">
-          <button
-            onClick={() => setStep(Math.max(1, step - 1))}
-            disabled={step === 1}
-            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-              step === 1
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-gray-600 text-white hover:bg-gray-700'
-            }`}
+        {/* Navigation with Dropdown */}
+        <div className="p-6 border-t border-gray-200 bg-gray-50 flex justify-between items-center flex-wrap gap-4">
+          <select
+            value={step}
+            onChange={(e) => setStep(parseInt(e.target.value))}
+            className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 font-medium"
           >
-            Previous
-          </button>
+            {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
+              <option key={s} value={s}>
+                Step {s} of {totalSteps} - {stepTitles[s - 1]}
+              </option>
+            ))}
+          </select>
 
-          {step < totalSteps ? (
+          <div className="flex gap-3">
             <button
-              onClick={() => setStep(step + 1)}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              onClick={() => setStep(Math.max(1, step - 1))}
+              disabled={step === 1}
+              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                step === 1
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-600 text-white hover:bg-gray-700'
+              }`}
             >
-              Next Step
+              Previous
             </button>
-          ) : (
-            <button
-              onClick={handleSubmit}
-              className="px-8 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center space-x-2"
-            >
-              <Save className="w-5 h-5" />
-              <span>Submit Medical Form</span>
-            </button>
-          )}
+
+            {step < totalSteps ? (
+              <button
+                onClick={() => setStep(step + 1)}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              >
+                Next Step
+              </button>
+            ) : (
+              <button
+                onClick={handleSubmit}
+                className="px-8 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center space-x-2"
+              >
+                <Save className="w-5 h-5" />
+                <span>Submit Medical Form</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

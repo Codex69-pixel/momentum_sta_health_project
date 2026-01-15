@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Pill, TestTube, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { FileText, Pill, TestTube, CheckCircle, Clock } from 'lucide-react';
 
 const mockPatients = [
   {

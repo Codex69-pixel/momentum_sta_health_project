@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart3, TrendingUp, Users, Clock, AlertCircle, Download } from 'lucide-react';
+import { BarChart3, Users, Clock } from 'lucide-react';
 
 const mockAnalytics = {
   patientVolume: {
@@ -30,44 +30,44 @@ const mockAnalytics = {
 
 export function AnalyticsDashboard() {
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-gray-900 mb-2 text-2xl font-bold">Analytics Dashboard</h1>
-        <p className="text-gray-600">Hospital performance metrics and statistics</p>
+    <div className="max-w-7xl mx-auto p-4 sm:p-6">
+      <div className="mb-4">
+        <h1 className="text-gray-900 mb-1 text-2xl font-bold">Analytics Dashboard</h1>
+        <p className="text-gray-600 text-sm">Hospital performance metrics and statistics</p>
       </div>
 
       {/* Patient Volume */}
-      <div className="mb-6">
-        <h2 className="text-gray-900 mb-4 text-lg font-semibold">Patient Volume</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-gray-600 mb-2">Today</div>
-            <div className="text-gray-900 text-2xl font-bold">{mockAnalytics.patientVolume.daily}</div>
-            <div className="text-gray-600 text-sm">patients</div>
+      <div className="mb-4">
+        <h2 className="text-gray-900 mb-3 text-base font-semibold">Patient Volume</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+          <div className="bg-white p-3 sm:p-4 rounded-lg shadow">
+            <div className="text-gray-600 mb-1 text-xs sm:text-sm">Today</div>
+            <div className="text-gray-900 text-lg sm:text-2xl font-bold">{mockAnalytics.patientVolume.daily}</div>
+            <div className="text-gray-600 text-xs">patients</div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-gray-600 mb-2">This Week</div>
-            <div className="text-gray-900 text-2xl font-bold">{mockAnalytics.patientVolume.weekly}</div>
-            <div className="text-gray-600 text-sm">patients</div>
+          <div className="bg-white p-3 sm:p-4 rounded-lg shadow">
+            <div className="text-gray-600 mb-1 text-xs sm:text-sm">This Week</div>
+            <div className="text-gray-900 text-lg sm:text-2xl font-bold">{mockAnalytics.patientVolume.weekly}</div>
+            <div className="text-gray-600 text-xs">patients</div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-gray-600 mb-2">This Month</div>
-            <div className="text-gray-900 text-2xl font-bold">{mockAnalytics.patientVolume.monthly}</div>
-            <div className="text-gray-600 text-sm">patients</div>
+          <div className="bg-white p-3 sm:p-4 rounded-lg shadow">
+            <div className="text-gray-600 mb-1 text-xs sm:text-sm">This Month</div>
+            <div className="text-gray-900 text-lg sm:text-2xl font-bold">{mockAnalytics.patientVolume.monthly}</div>
+            <div className="text-gray-600 text-xs">patients</div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-gray-600 mb-2">Avg per Day</div>
-            <div className="text-gray-900 text-2xl font-bold">{Math.round(mockAnalytics.patientVolume.monthly / 30)}</div>
-            <div className="text-gray-600 text-sm">patients</div>
+          <div className="bg-white p-3 sm:p-4 rounded-lg shadow">
+            <div className="text-gray-600 mb-1 text-xs sm:text-sm">Avg per Day</div>
+            <div className="text-gray-900 text-lg sm:text-2xl font-bold">{Math.round(mockAnalytics.patientVolume.monthly / 30)}</div>
+            <div className="text-gray-600 text-xs">patients</div>
           </div>
         </div>
       </div>
 
       {/* Average Wait Times */}
-      <div className="mb-6">
-        <h2 className="text-gray-900 mb-4 text-lg font-semibold">Average Wait Times by Urgency</h2>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="mb-4">
+        <h2 className="text-gray-900 mb-3 text-base font-semibold">Average Wait Times by Urgency</h2>
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-2">
@@ -110,9 +110,10 @@ export function AnalyticsDashboard() {
       </div>
 
       {/* Department Performance */}
-      <div className="mb-6">
-        <h2 className="text-gray-900 mb-4 text-lg font-semibold">Department Performance</h2>
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="mb-4">
+        <h2 className="text-gray-900 mb-3 text-base font-semibold">Department Performance</h2>
+        {/* Desktop Table */}
+        <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
@@ -150,19 +151,46 @@ export function AnalyticsDashboard() {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Cards */}
+        <div className="md:hidden space-y-4">
+          {mockAnalytics.departmentStats.map((dept, index) => (
+            <div key={index} className="bg-white rounded-lg shadow p-4">
+              <h3 className="text-gray-900 font-semibold mb-3">{dept.dept}</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600">Patients</span>
+                  <span className="text-gray-900 font-semibold">{dept.patients}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600">Avg Wait</span>
+                  <span className="text-gray-900 font-semibold">{dept.avgWait} min</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600">Satisfaction</span>
+                  <span className={`px-2 py-1 rounded text-xs font-medium ${
+                    dept.satisfaction >= 85 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                  }`}>
+                    {dept.satisfaction}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Resource Utilization */}
       <div>
-        <h2 className="text-gray-900 mb-4 text-lg font-semibold">Resource Utilization Overview</h2>
-        <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow p-6 text-white">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <h2 className="text-gray-900 mb-3 text-base font-semibold">Resource Utilization Overview</h2>
+        <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-lg shadow p-4 sm:p-6 text-white">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             <div>
               <div className="flex items-center space-x-2 mb-3">
-                <BarChart3 className="w-6 h-6" />
-                <span>Bed Utilization</span>
+                <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span className="text-sm sm:text-base">Bed Utilization</span>
               </div>
-              <div className="text-3xl font-bold mb-2">{mockAnalytics.resourceUtilization.beds}%</div>
+              <div className="text-2xl sm:text-3xl font-bold mb-2">{mockAnalytics.resourceUtilization.beds}%</div>
               <div className="w-full h-3 bg-white/20 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-white"
@@ -172,10 +200,10 @@ export function AnalyticsDashboard() {
             </div>
             <div>
               <div className="flex items-center space-x-2 mb-3">
-                <Users className="w-6 h-6" />
-                <span>Staff Utilization</span>
+                <Users className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span className="text-sm sm:text-base">Staff Utilization</span>
               </div>
-              <div className="text-3xl font-bold mb-2">{mockAnalytics.resourceUtilization.staff}%</div>
+              <div className="text-2xl sm:text-3xl font-bold mb-2">{mockAnalytics.resourceUtilization.staff}%</div>
               <div className="w-full h-3 bg-white/20 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-white"
@@ -185,10 +213,10 @@ export function AnalyticsDashboard() {
             </div>
             <div>
               <div className="flex items-center space-x-2 mb-3">
-                <BarChart3 className="w-6 h-6" />
-                <span>Equipment Utilization</span>
+                <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span className="text-sm sm:text-base">Equipment Utilization</span>
               </div>
-              <div className="text-3xl font-bold mb-2">{mockAnalytics.resourceUtilization.equipment}%</div>
+              <div className="text-2xl sm:text-3xl font-bold mb-2">{mockAnalytics.resourceUtilization.equipment}%</div>
               <div className="w-full h-3 bg-white/20 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-white"
