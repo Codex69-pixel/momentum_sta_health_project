@@ -66,6 +66,12 @@ export function Sidebar({ isOpen, onClose, currentScreen, onNavigate, user, onLo
       label: 'Analytics', 
       icon: BarChart3, 
       roles: ['admin'],
+    },
+    { 
+      id: 'logout', 
+      label: 'Logout', 
+      icon: LogOut, 
+      roles: ['admin'],
     }
   ];
 
@@ -73,8 +79,12 @@ export function Sidebar({ isOpen, onClose, currentScreen, onNavigate, user, onLo
   const visibleMenuItems = menuItems.filter(item => item.roles.includes(user?.role));
 
   const handleNavigate = (screenId) => {
-    onNavigate(screenId);
-    onClose();
+    if (screenId === 'logout') {
+      handleLogout();
+    } else {
+      onNavigate(screenId);
+      onClose();
+    }
   };
 
   const handleLogout = () => {
@@ -97,7 +107,7 @@ export function Sidebar({ isOpen, onClose, currentScreen, onNavigate, user, onLo
 
       {/* Sidebar */}
       <div
-        className="fixed top-16 left-0 bg-white shadow-2xl z-40 overflow-y-auto transition-all duration-300"
+        className="fixed top-16 left-0 bg-white shadow-2xl z-40 transition-all duration-300 flex flex-col"
         style={{
           width: '256px',
           transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
@@ -106,7 +116,7 @@ export function Sidebar({ isOpen, onClose, currentScreen, onNavigate, user, onLo
         }}
       >
         {/* Header Section with User Info */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white sticky top-0">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white flex-shrink-0">
           {/* Close button for mobile */}
           <div className="flex justify-end mb-4">
             <button
@@ -130,25 +140,28 @@ export function Sidebar({ isOpen, onClose, currentScreen, onNavigate, user, onLo
           </div>
         </div>
 
-        {/* Navigation Menu */}
-        <nav className="p-4 space-y-2">
+        {/* Navigation Menu - Scrollable */}
+        <nav className="flex-1 overflow-y-auto p-4 space-y-2">
           {visibleMenuItems.map((item) => {
             const IconComponent = item.icon;
             const isActive = currentScreen === item.id;
+            const isLogout = item.id === 'logout';
             
             return (
               <button
                 key={item.id}
                 onClick={() => handleNavigate(item.id)}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                  isActive
+                  isLogout
+                    ? 'text-red-600 hover:bg-red-50 border border-red-200'
+                    : isActive
                     ? 'bg-blue-600 text-white shadow-lg'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
                 <IconComponent className="w-5 h-5 flex-shrink-0" />
                 <span className="font-medium text-sm flex-1 text-left">{item.label}</span>
-                {isActive && (
+                {isActive && !isLogout && (
                   <div className="w-2 h-2 bg-white rounded-full flex-shrink-0" />
                 )}
               </button>
@@ -156,11 +169,11 @@ export function Sidebar({ isOpen, onClose, currentScreen, onNavigate, user, onLo
           })}
         </nav>
 
-        {/* Logout Section */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-gray-50">
+        {/* Logout Section for all users - Fixed at bottom */}
+        <div className="flex-shrink-0 p-4 border-t border-gray-200 bg-gray-50">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-all duration-200 font-medium"
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-all duration-200 font-medium border border-red-200"
           >
             <LogOut className="w-5 h-5 flex-shrink-0" />
             <span className="text-sm flex-1 text-left">Logout</span>
