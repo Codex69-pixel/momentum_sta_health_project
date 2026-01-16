@@ -35,7 +35,7 @@ export function Sidebar({ isOpen, onClose, currentScreen, onNavigate, user, onLo
       id: 'nurse', 
       label: 'Nurse Triage', 
       icon: Stethoscope, 
-      roles: ['nurse', 'admin'],
+      roles: ['nurse'],
     },
     { 
       id: 'queue', 
@@ -65,12 +65,6 @@ export function Sidebar({ isOpen, onClose, currentScreen, onNavigate, user, onLo
       id: 'analytics', 
       label: 'Analytics', 
       icon: BarChart3, 
-      roles: ['admin'],
-    },
-    { 
-      id: 'logout', 
-      label: 'Logout', 
-      icon: LogOut, 
       roles: ['admin'],
     }
   ];
@@ -107,7 +101,7 @@ export function Sidebar({ isOpen, onClose, currentScreen, onNavigate, user, onLo
 
       {/* Sidebar */}
       <div
-        className="fixed top-16 left-0 bg-white shadow-2xl z-40 transition-all duration-300 flex flex-col"
+        className="fixed top-16 left-0 bg-white shadow-2xl z-40 transition-all duration-300 flex flex-col overflow-hidden"
         style={{
           width: '256px',
           transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
@@ -141,33 +135,32 @@ export function Sidebar({ isOpen, onClose, currentScreen, onNavigate, user, onLo
         </div>
 
         {/* Navigation Menu - Scrollable */}
-        <nav className="flex-1 overflow-y-auto p-4 space-y-2">
-          {visibleMenuItems.map((item) => {
-            const IconComponent = item.icon;
-            const isActive = currentScreen === item.id;
-            const isLogout = item.id === 'logout';
-            
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleNavigate(item.id)}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                  isLogout
-                    ? 'text-red-600 hover:bg-red-50 border border-red-200'
-                    : isActive
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <IconComponent className="w-5 h-5 flex-shrink-0" />
-                <span className="font-medium text-sm flex-1 text-left">{item.label}</span>
-                {isActive && !isLogout && (
-                  <div className="w-2 h-2 bg-white rounded-full flex-shrink-0" />
-                )}
-              </button>
-            );
-          })}
-        </nav>
+        <div className="flex-1 overflow-y-auto overflow-x-hidden" style={{ minHeight: 0 }}>
+          <nav className="p-4 space-y-2" style={{ paddingBottom: '5rem' }}>
+            {visibleMenuItems.map((item) => {
+              const IconComponent = item.icon;
+              const isActive = currentScreen === item.id;
+              
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavigate(item.id)}
+                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                    isActive
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <IconComponent className="w-5 h-5 flex-shrink-0" />
+                  <span className="font-medium text-sm flex-1 text-left">{item.label}</span>
+                  {isActive && (
+                    <div className="w-2 h-2 bg-white rounded-full flex-shrink-0" />
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
 
         {/* Logout Section for all users - Fixed at bottom */}
         <div className="flex-shrink-0 p-4 border-t border-gray-200 bg-gray-50">
