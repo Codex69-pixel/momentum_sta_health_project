@@ -37,8 +37,12 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <TopBar onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+    <div className="h-screen w-full flex flex-col bg-gray-50">
+      <TopBar 
+        onMenuToggle={() => setSidebarOpen(!sidebarOpen)} 
+        user={user}
+        onLogout={handleLogout}
+      />
       
       <Sidebar 
         isOpen={sidebarOpen}
@@ -49,7 +53,7 @@ export default function App() {
         onLogout={handleLogout}
       />
       
-      <main className="pt-16 w-full overflow-auto">
+      <main className="flex-1 overflow-auto w-full bg-gray-50">
         {currentScreen === 'nurse' && <NurseTriage />}
         {currentScreen === 'queue' && <QueueManagement />}
         {currentScreen === 'resources' && <ResourceDashboard />}

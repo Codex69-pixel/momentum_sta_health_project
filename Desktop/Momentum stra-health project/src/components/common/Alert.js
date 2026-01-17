@@ -37,11 +37,11 @@ export function Alert({
       iconColor: 'text-yellow-600'
     },
     info: {
-      bg: 'bg-blue-50',
-      border: 'border-blue-200',
-      text: 'text-blue-800',
+      bg: 'bg-teal-50',
+      border: 'border-teal-200',
+      text: 'text-teal-800',
       icon: Info,
-      iconColor: 'text-blue-600'
+      iconColor: 'text-teal-600'
     }
   };
   
