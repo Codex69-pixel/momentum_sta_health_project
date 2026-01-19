@@ -1,0 +1,394 @@
+/* Login Screen Styles */
+
+.login-container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 100%;
+  height: 100vh;
+  background: white;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+}
+
+@media (max-width: 1024px) {
+  .login-card {
+    flex-direction: column;
+    height: auto;
+  }
+}
+
+/* Left Side - Illustration */
+.login-illustration {
+  width: 50%;
+  background: white;
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+@media (max-width: 1024px) {
+  .login-illustration {
+    width: 100%;
+    padding: 2rem;
+    min-height: 50vh;
+  }
+}
+
+.login-illustration img {
+  width: 100%;
+  height: auto;
+  max-width: 650px;
+  object-fit: contain;
+}
+
+/* Right Side - Form */
+.login-form-container {
+  width: 50%;
+  padding: 4rem 5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: white;
+}
+
+@media (max-width: 1024px) {
+  .login-form-container {
+    width: 100%;
+    padding: 2rem;
+  }
+}
+
+/* Hospital Header */
+.hospital-header {
+  margin-bottom: 3rem;
+  text-align: right;
+}
+
+.hospital-logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.hospital-logo {
+  width: 3rem;
+  height: 3rem;
+  background: #ff6b7a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  position: relative;
+}
+
+.hospital-logo::before,
+.hospital-logo::after {
+  content: '';
+  background: white;
+  position: absolute;
+}
+
+.hospital-logo::before {
+  width: 1.5rem;
+  height: 0.35rem;
+}
+
+.hospital-logo::after {
+  width: 0.35rem;
+  height: 1.5rem;
+}
+
+.hospital-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #006466;
+  letter-spacing: -0.02em;
+}
+
+.hospital-subtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+  text-align: right;
+  font-weight: 400;
+}
+
+/* Welcome Header */
+.welcome-header {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.welcome-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.welcome-subtitle {
+  color: #111827;
+  font-size: 1.125rem;
+  font-weight: 400;
+}
+
+/* Form */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Input Container */
+.input-container {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #111827;
+  z-index: 1;
+}
+
+.form-input {
+  width: 100%;
+  padding: 1rem 1.25rem 1rem 3.5rem;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  outline: none;
+  transition: all 0.2s;
+  font-size: 1rem;
+  color: #111827;
+}
+
+.form-input::placeholder {
+  color: #111827;
+}
+
+.form-input:focus {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  box-shadow: none;
+}
+
+.password-input {
+  padding-right: 3.5rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #111827;
+  transition: color 0.2s;
+  z-index: 1;
+  padding: 0;
+}
+
+.password-toggle:hover {
+  color: #374151;
+}
+
+.password-toggle .input-icon {
+  position: static;
+  transform: none;
+}
+
+/* Select Dropdown */
+.select-container {
+  position: relative;
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  outline: none;
+  transition: all 0.2s;
+  appearance: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.form-select:focus {
+  ring: 2px;
+  ring-color: #06b6d4;
+  border-color: transparent;
+  box-shadow: 0 0 0 2px #06b6d4;
+}
+
+.select-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #9ca3af;
+}
+
+/* Remember Me Section */
+.remember-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  padding: 0;
+  margin-top: -0.25rem;
+}
+
+.remember-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.remember-checkbox {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: #14b8a6;
+  border: 2px solid #d1d5db;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  accent-color: #14b8a6;
+}
+
+.remember-checkbox:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.remember-text {
+  color: #111827;
+  font-weight: 400;
+}
+
+.need-help-button {
+  background: none;
+  border: none;
+  color: #14b8a6;
+  font-weight: 400;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 0;
+  font-size: 0.95rem;
+}
+
+.need-help-button:hover {
+  color: #0d9488;
+  text-decoration: none;
+}
+
+/* Login Button */
+.login-button {
+  width: 100%;
+  background: #14b8a6;
+  color: white;
+  font-weight: 600;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: none;
+  font-size: 1.125rem;
+  margin-top: 0.5rem;
+}
+
+.login-button:hover {
+  background: #0d9488;
+  box-shadow: none;
+}
+
+/* Alternative Login Options */
+.alternative-login {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.alternative-login-text {
+  text-align: center;
+  font-size: 1rem;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.alternative-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.alternative-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  padding: 0.875rem 1.5rem;
+  background: white;
+  border: 2px solid #14b8a6;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.alternative-button:hover {
+  background: #f0fdfa;
+  border-color: #0d9488;
+  box-shadow: none;
+}
+
+.alternative-button-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+}
+
+.alternative-button-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #14b8a6;
+}
+
+.alternative-button:hover .alternative-button-text {
+  color: #0d9488;
+}
+
+.twitter-icon {
+  color: #1DA1F2;
+}
+
+.alternative-button:hover .twitter-icon {
+  color: #1a8cd8;
+}
