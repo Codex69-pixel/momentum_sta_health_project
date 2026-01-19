@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Lock, User as UserIcon, Eye, EyeOff } from 'lucide-react';
-import medicalIllustration from '../assets/medical-illustration.svg';
 import './LoginScreen.css';
 
 export function LoginScreen({ onLogin }) {
@@ -34,8 +33,9 @@ export function LoginScreen({ onLogin }) {
         {/* Left Side - Illustration */}
         <div className="login-illustration">
           <img 
-            src={medicalIllustration} 
+            src="/home-page-image.png" 
             alt="Medical Team Illustration"
+            loading="eager"
           />
         </div>
 
