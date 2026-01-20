@@ -1,0 +1,272 @@
+/* Doctor Dashboard Grid Layout */
+
+.doctor-dashboard-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f6f8fa;
+}
+
+.doctor-dashboard-topbar {
+  width: 100%;
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.doctor-dashboard-content-area {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.doctor-dashboard-sidebar {
+  width: 260px;
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.doctor-dashboard-main {
+  flex: 1;
+  padding: 32px;
+  background: #f6f8fa;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+
+
+.sidebar-placeholder,
+.main-placeholder,
+.right-panel-placeholder {
+  color: #bbb;
+  font-size: 1.2rem;
+  text-align: center;
+  margin-top: 48px;
+}
+/* DoctorPortal.css - Custom styles for Doctor Portal layout */
+
+.doctor-portal-container {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #e0f7fa 100%);
+  padding: 32px 0;
+  box-sizing: border-box;
+}
+
+.doctor-portal-main {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+}
+
+.doctor-portal-sidebar {
+  flex: 0 0 320px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  border: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  min-height: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+.doctor-portal-sidebar-header {
+  background: linear-gradient(90deg, #14b8a6 0%, #0d9488 100%);
+  color: #fff;
+  padding: 24px 24px 16px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.doctor-portal-sidebar-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px 16px 16px;
+}
+
+.doctor-portal-sidebar-patient {
+  background: #f7fafc;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: background 0.2s, border 0.2s;
+  display: block;
+}
+.doctor-portal-sidebar-patient.selected {
+  background: #e0f7fa;
+  border-left: 4px solid #14b8a6;
+}
+
+.doctor-portal-sidebar-patient .urgency-badge {
+  float: right;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 16px;
+  color: #fff;
+  margin-left: 8px;
+}
+.doctor-portal-sidebar-patient .urgency-red { background: #ef4444; }
+.doctor-portal-sidebar-patient .urgency-yellow { background: #fbbf24; }
+.doctor-portal-sidebar-patient .urgency-green { background: #22c55e; }
+
+.doctor-portal-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.doctor-portal-header-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  border-left: 6px solid #14b8a6;
+  padding: 32px;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.doctor-portal-header-info {
+  flex: 1;
+}
+
+.doctor-portal-header-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  color: #fff;
+  font-size: 2.2rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.doctor-portal-vitals {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 0;
+}
+
+.doctor-portal-vital-card {
+  background: #f7fafc;
+  border-radius: 12px;
+  padding: 18px 20px;
+  flex: 1;
+  text-align: center;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+
+.doctor-portal-tabs {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  border: 1px solid #e0e0e0;
+  margin-bottom: 0;
+}
+.doctor-portal-tab-nav {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  background: #f7fafc;
+  border-radius: 18px 18px 0 0;
+}
+.doctor-portal-tab-btn {
+  flex: 1;
+  padding: 18px 0;
+  font-weight: 600;
+  font-size: 1rem;
+  background: none;
+  border: none;
+  color: #14b8a6;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: background 0.2s, color 0.2s, border-bottom 0.2s;
+}
+.doctor-portal-tab-btn.active {
+  background: #fff;
+  color: #0d9488;
+  border-bottom: 2px solid #14b8a6;
+}
+.doctor-portal-tab-content {
+  padding: 32px;
+}
+
+.doctor-portal-actions {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+}
+.doctor-portal-action-btn {
+  flex: 1;
+  padding: 18px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  background: #14b8a6;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  transition: background 0.2s;
+}
+.doctor-portal-action-btn.secondary {
+  background: #e0e0e0;
+  color: #333;
+}
+
+
+
+@media (max-width: 1200px) {
+  .doctor-dashboard-sidebar {
+    width: 180px;
+  }
+  .doctor-dashboard-main {
+    padding: 18px;
+  }
+}
+
+
+@media (max-width: 900px) {
+  .doctor-dashboard-layout {
+    flex-direction: column;
+  }
+  .doctor-dashboard-content-area {
+    flex-direction: column;
+  }
+  .doctor-dashboard-sidebar {
+    width: 100%;
+    min-height: 120px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .doctor-dashboard-main {
+    padding: 12px;
+  }
+}
