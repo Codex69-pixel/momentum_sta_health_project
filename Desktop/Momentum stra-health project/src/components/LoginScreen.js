@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { Lock, User as UserIcon, Eye, EyeOff } from 'lucide-react';
+import { Lock, User as UserIcon, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import './LoginScreen.css';
 
 export function LoginScreen({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedRole] = useState('doctor');
+  const [selectedRole, setSelectedRole] = useState('doctor');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+
+  // Prevent page from being covered by TopBar/Sidebar by using absolute/fixed positioning only for those, not here
+  // Remove any 100vh/viewport height that causes zooming or overflow
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -29,7 +32,6 @@ export function LoginScreen({ onLogin }) {
     <div className="login-container">
       {/* Main Container */}
       <div className="login-card">
-        
         {/* Left Side - Illustration */}
         <div className="login-illustration">
           <img 
@@ -38,19 +40,9 @@ export function LoginScreen({ onLogin }) {
             loading="eager"
           />
         </div>
-
         {/* Right Side - Login Form */}
         <div className="login-form-container">
-          
-          {/* Hospital Header */}
-          <div className="hospital-header">
-            <div className="hospital-logo-container">
-              <div className="hospital-logo"></div>
-              <h1 className="hospital-title">Hong Kong</h1>
-            </div>
-            <p className="hospital-subtitle">Emergency & General Hospital</p>
-          </div>
-
+          {/* Hospital Header removed as requested */}
           {/* Welcome Header */}
           <div className="welcome-header">
             <h2 className="welcome-title">
@@ -65,44 +57,61 @@ export function LoginScreen({ onLogin }) {
             {/* Username Input */}
             <div>
               <div className="input-container">
-                <div>
-                  <UserIcon className="input-icon" />
-                </div>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="max.alan@hkgeneral.com"
-                  className="form-input"
-                />
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="max.alan@hkgeneral.com"
+                    className="form-input"
+                    style={{ paddingRight: '2.5rem' }}
+                  />
+                  <div style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', display: 'flex', alignItems: 'center', height: '100%' }}>
+                    <UserIcon className="input-icon" style={{ color: '#9ca3af', width: '1.25rem', height: '1.25rem' }} />
+                  </div>
               </div>
             </div>
 
             {/* Password Input */}
             <div>
               <div className="input-container">
-                <div>
-                  <Lock className="input-icon" />
-                </div>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••••••"
-                  className="form-input password-input"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="password-toggle"
-                >
-                  {showPassword ? <EyeOff className="input-icon" /> : <Eye className="input-icon" />}
-                </button>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••••••"
+                    className="form-input password-input"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="password-toggle"
+                  >
+                    {showPassword ? <EyeOff className="input-icon" /> : <Eye className="input-icon" />}
+                  </button>
               </div>
             </div>
 
-            {/* Hidden Role Dropdown */}
-            <input type="hidden" value={selectedRole} />
+            {/* Role Dropdown */}
+            <div>
+              <div className="input-container">
+                  <div>
+                    <UserIcon className="input-icon" />
+                  </div>
+                  <select
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value)}
+                    className="form-input"
+                    style={{ appearance: 'none', cursor: 'pointer', paddingRight: '2.5rem' }}
+                  >
+                    {Object.entries(roleLabels).map(([role, label]) => (
+                      <option key={role} value={role}>{label}</option>
+                    ))}
+                  </select>
+                  <div style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', display: 'flex', alignItems: 'center', height: '100%' }}>
+                    <ChevronDown className="input-icon" style={{ color: '#9ca3af', width: '1.25rem', height: '1.25rem' }} />
+                  </div>
+              </div>
+            </div>
 
             {/* Remember Me & Need Help */}
             <div className="remember-section">

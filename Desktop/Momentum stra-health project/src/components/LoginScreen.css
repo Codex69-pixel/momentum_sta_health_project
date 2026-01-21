@@ -1,24 +1,33 @@
 /* Login Screen Styles */
 
+
 .login-container {
-  min-height: 100vh;
+  min-height: 100dvh;
+  height: 100dvh;
   background: radial-gradient(circle at 25% 20%, #f4fafc 0%, #edf5f9 45%, #f7fbfd 70%, #ffffff 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
+  overflow: auto;
+  position: relative;
+  z-index: 1;
 }
 
+
 .login-card {
-  width: 100%;
-  max-width: 100%;
-  height: 100vh;
+  width: 100vw;
+  max-width: 100vw;
+  height: calc(100dvh - 0px);
+  min-height: 0;
   background: radial-gradient(circle at 25% 20%, #f4fafc 0%, #edf5f9 45%, #f7fbfd 70%, #ffffff 100%);
   box-shadow: none;
   border-radius: 0;
-  overflow: hidden;
+  overflow: auto;
   display: flex;
   flex-direction: row;
+  position: relative;
+  z-index: 2;
 }
 
 @media (max-width: 1024px) {
@@ -29,51 +38,63 @@
 }
 
 /* Left Side - Illustration */
+
 .login-illustration {
   width: 50%;
   background: transparent;
-  padding: 3rem;
+  padding: 2rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  min-height: unset;
+  height: 100%;
 }
 
 @media (max-width: 1024px) {
   .login-illustration {
     width: 100%;
-    padding: 2rem;
-    min-height: 50vh;
+    padding: 1.5rem 0.5rem;
+    min-height: unset;
+    height: 30vh;
+    max-height: 200px;
   }
 }
+
 
 .login-illustration img {
   width: 100%;
   height: auto;
   max-width: 780px;
   object-fit: contain;
-  border-radius: 1.5rem;
-  box-shadow: 0 24px 60px rgba(15, 118, 110, 0.08), 0 12px 30px rgba(17, 24, 39, 0.05);
+  filter: drop-shadow(0 20px 40px rgba(15, 118, 110, 0.15));
 }
 
 /* Right Side - Form */
+
 .login-form-container {
   width: 50%;
-  padding: 4rem 5rem;
+  margin: 0;
+  padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-left: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-left: none;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  overflow-y: auto;
+  height: 100%;
 }
 
 @media (max-width: 1024px) {
   .login-form-container {
     width: 100%;
-    padding: 2rem;
+    min-width: unset;
+    max-width: unset;
+    padding: 1.5rem 0.5rem;
+    height: auto;
+    max-height: unset;
   }
 }
 
