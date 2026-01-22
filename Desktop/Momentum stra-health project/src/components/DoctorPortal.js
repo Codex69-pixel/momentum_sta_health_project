@@ -87,6 +87,7 @@ export function DoctorPortal() {
   const [selectedPatient, setSelectedPatient] = useState(mockPatients[0]);
   const [clinicalNotes, setClinicalNotes] = useState('');
 
+
   // Top bar content (can be customized)
   const TopBar = () => (
     <div className="doctor-dashboard-topbar">

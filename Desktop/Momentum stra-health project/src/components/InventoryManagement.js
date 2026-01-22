@@ -59,7 +59,7 @@ export function InventoryManagement() {
           <div className="stat-card">
             <div className="flex items-center justify-between mb-3">
               <Package className="w-8 h-8 text-blue-600" />
-              <span className="text-2xl font-bold text-blue-600">{stats.total}</span>
+        </div>
             </div>
             <p className="text-gray-700 font-semibold">Total Stock Items</p>
             <p className="text-gray-500 text-sm">All medications</p>
@@ -247,7 +247,6 @@ export function InventoryManagement() {
               ))}
             </div>
           </div>
-        </div>
       </div>
     </div>
   );
