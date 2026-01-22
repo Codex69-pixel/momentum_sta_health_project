@@ -337,8 +337,6 @@
 }
 
 .form-select:focus {
-  ring: 2px;
-  ring-color: #06b6d4;
   border-color: transparent;
   box-shadow: 0 0 0 2px #06b6d4;
 }

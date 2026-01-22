@@ -54,33 +54,34 @@ export function InventoryManagement() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-teal-50/30">
       {/* Fixed TopBar with proper z-index */}
-    <header className="w-full shadow-lg fixed top-0 left-0 z-50 border-b border-teal-800" style={{background: '#14B8A6'}}>
-        <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-4 md:px-6">
+      <header className="w-full shadow-lg fixed top-0 left-0 z-50 border-b border-teal-800" style={{background: '#14B8A6'}}>
+        <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-2 sm:px-4 md:px-6">
           {/* Left: Logo/Brand and Mobile Menu Button */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <button 
-              className="md:hidden p-2 rounded-lg hover:bg-teal-500/30"
+              className="md:hidden p-2 rounded-lg hover:bg-teal-500/30 focus:outline-none focus:ring-2 focus:ring-white"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Open navigation menu"
             >
               {mobileMenuOpen ? (
-                <X className="w-5 h-5 text-white" />
+                <X className="w-6 h-6 text-white" />
               ) : (
-                <Menu className="w-5 h-5 text-white" />
+                <Menu className="w-6 h-6 text-white" />
               )}
             </button>
-            <span className="text-lg md:text-2xl font-bold text-white tracking-tight">Stra-Health Pharmacy</span>
+            <span className="text-base sm:text-lg md:text-2xl font-bold text-white tracking-tight">Stra-Health Pharmacy</span>
           </div>
 
           {/* Center: Navigation Buttons - Desktop */}
-          <nav className="hidden md:flex items-center space-x-4">
+          <nav className="hidden md:flex items-center space-x-2 sm:space-x-4">
             <button 
-              className="px-4 py-2 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition"
+              className="px-3 sm:px-4 py-2 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition text-sm sm:text-base"
               onClick={() => window.location.href = '/pharmacy/home'}
             >
               <Home className="inline w-5 h-5 mr-1" /> Home
             </button>
             <button 
-              className="px-4 py-2 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition"
+              className="px-3 sm:px-4 py-2 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition text-sm sm:text-base"
               onClick={() => window.location.href = '/pharmacy/analytics'}
             >
               <BarChart3 className="inline w-5 h-5 mr-1" /> Analytics
@@ -92,13 +93,13 @@ export function InventoryManagement() {
             <button
               className="flex items-center space-x-2 p-2 hover:bg-teal-500/30 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-white"
               onClick={() => setShowUserMenu(!showUserMenu)}
+              aria-label="Open user menu"
             >
               <div className="w-8 h-8 bg-white/20 border border-white/30 rounded-full flex items-center justify-center">
                 <User className="w-5 h-5 text-white" />
               </div>
               <ChevronDown className={`w-4 h-4 text-white/60 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
             </button>
-            
             {/* User Dropdown Menu */}
             {showUserMenu && (
               <>
@@ -122,10 +123,10 @@ export function InventoryManagement() {
 
         {/* Mobile Navigation Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-teal-700 border-t border-teal-800 px-4 py-3">
+          <div className="md:hidden bg-teal-700 border-t border-teal-800 px-2 py-2 sm:px-4 sm:py-3">
             <div className="flex flex-col space-y-2">
               <button 
-                className="w-full text-left px-4 py-3 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition"
+                className="w-full text-left px-4 py-3 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition text-base"
                 onClick={() => {
                   window.location.href = '/pharmacy/home';
                   setMobileMenuOpen(false);
@@ -134,7 +135,7 @@ export function InventoryManagement() {
                 <Home className="inline w-5 h-5 mr-2" /> Home
               </button>
               <button 
-                className="w-full text-left px-4 py-3 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition"
+                className="w-full text-left px-4 py-3 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition text-base"
                 onClick={() => {
                   window.location.href = '/pharmacy/analytics';
                   setMobileMenuOpen(false);
@@ -148,50 +149,52 @@ export function InventoryManagement() {
       </header>
 
       {/* Main Content - Adjusted for fixed TopBar */}
-      <div className="w-full pt-20 p-4 md:p-6">
+      <div className="w-full pt-80 p-2 sm:p-8 md:p-12">
         <div className="max-w-7xl mx-auto">
+          {/* Spacer for extra top space */}
+          <div className="h-4 md:h-8" />
           {/* Header */}
-          <div className="mb-8 animate-fadeIn">
+          <div className="mb-8 animate-fadeIn" style={{marginTop: '2.5rem'}}>
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Pharmacy Inventory</h1>
             <p className="text-gray-600">Real-time medication stock management and alerts</p>
           </div>
 
-          {/* Stats Cards - Responsive */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          {/* Stats Cards - Enhanced Responsive Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-6 mb-8">
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 min-w-0">
               <div className="flex items-center justify-between mb-3">
-                <Package className="w-8 h-8 text-blue-600" />
-                <span className="text-2xl font-bold text-blue-600">{stats.total}</span>
+                <Package className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600" />
+                <span className="text-xl sm:text-2xl font-bold text-blue-600">{stats.total}</span>
               </div>
-              <p className="text-gray-700 font-semibold">Total Stock Items</p>
-              <p className="text-gray-500 text-sm">All medications</p>
+              <p className="text-gray-700 font-semibold text-base sm:text-lg">Total Stock Items</p>
+              <p className="text-gray-500 text-xs sm:text-sm">All medications</p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 min-w-0">
               <div className="flex items-center justify-between mb-3">
-                <AlertTriangle className="w-8 h-8 text-red-600" />
-                <span className="text-2xl font-bold text-red-600">{stats.critical}</span>
+                <AlertTriangle className="w-7 h-7 sm:w-8 sm:h-8 text-red-600" />
+                <span className="text-xl sm:text-2xl font-bold text-red-600">{stats.critical}</span>
               </div>
-              <p className="text-gray-700 font-semibold">Critical Stock</p>
-              <p className="text-gray-500 text-sm">Needs immediate action</p>
+              <p className="text-gray-700 font-semibold text-base sm:text-lg">Critical Stock</p>
+              <p className="text-gray-500 text-xs sm:text-sm">Needs immediate action</p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 min-w-0">
               <div className="flex items-center justify-between mb-3">
-                <ShoppingCart className="w-8 h-8 text-amber-600" />
-                <span className="text-2xl font-bold text-amber-600">{stats.reorderNeeded}</span>
+                <ShoppingCart className="w-7 h-7 sm:w-8 sm:h-8 text-amber-600" />
+                <span className="text-xl sm:text-2xl font-bold text-amber-600">{stats.reorderNeeded}</span>
               </div>
-              <p className="text-gray-700 font-semibold">Reorder Needed</p>
-              <p className="text-gray-500 text-sm">Below reorder level</p>
+              <p className="text-gray-700 font-semibold text-base sm:text-lg">Reorder Needed</p>
+              <p className="text-gray-500 text-xs sm:text-sm">Below reorder level</p>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 min-w-0">
               <div className="flex items-center justify-between mb-3">
-                <BarChart3 className="w-8 h-8 text-emerald-600" />
-                <span className="text-lg font-bold text-emerald-600">KES {(stats.totalValue/1000).toFixed(1)}k</span>
+                <BarChart3 className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-600" />
+                <span className="text-base sm:text-lg font-bold text-emerald-600">KES {(stats.totalValue/1000).toFixed(1)}k</span>
               </div>
-              <p className="text-gray-700 font-semibold">Inventory Value</p>
-              <p className="text-gray-500 text-sm">Total stock worth</p>
+              <p className="text-gray-700 font-semibold text-base sm:text-lg">Inventory Value</p>
+              <p className="text-gray-500 text-xs sm:text-sm">Total stock worth</p>
             </div>
           </div>
 

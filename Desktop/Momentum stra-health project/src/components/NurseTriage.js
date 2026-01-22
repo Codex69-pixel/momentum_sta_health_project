@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { logout } from '../utils/logout';
 import {
   User, Heart, Activity, Save, FileText, AlertCircle,
   CheckCircle, ArrowRight, ArrowLeft,
@@ -7,6 +8,7 @@ import {
 
 export function NurseTriage() {
   const [step, setStep] = useState(1);
+  const [showLogout, setShowLogout] = useState(false);
   const [formData, setFormData] = useState({
     // Step 1: Demographics
     name: '',
@@ -182,8 +184,62 @@ export function NurseTriage() {
   return (
     <>
       {/* Fixed TopBar for Nurse Triage */}
-      <header style={{position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 50, background: 'linear-gradient(to right, #14b8a6, #0d9488)', color: '#fff', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.04)'}}>
-        <h1 style={{fontWeight: 700, fontSize: '1.3rem', letterSpacing: '0.01em'}}>Nurses Stra-Health Triage</h1>
+      <header style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        zIndex: 50,
+        background: 'linear-gradient(to right, #14b8a6, #0d9488)',
+        color: '#fff',
+        height: '56px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        padding: '0 24px'
+      }}>
+        <h1 style={{fontWeight: 700, fontSize: '1.3rem', letterSpacing: '0.01em', margin: 0}}>Nurses Stra-Health Triage</h1>
+        <div style={{position: 'relative', display: 'flex', alignItems: 'center'}}>
+          <button
+            style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0, marginLeft: 16}}
+            onClick={() => setShowLogout(prev => !prev)}
+            aria-label="User menu"
+          >
+            <User size={28} />
+          </button>
+          {showLogout && (
+            <div style={{
+              position: 'absolute',
+              right: 0,
+              top: 'calc(100% + 8px)',
+              background: '#fff',
+              color: '#222',
+              borderRadius: 8,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+              minWidth: 120,
+              zIndex: 100,
+              padding: 8
+            }}>
+              <button
+                style={{
+                  width: '100%',
+                  background: 'none',
+                  border: 'none',
+                  color: '#0d9488',
+                  fontWeight: 600,
+                  fontSize: 16,
+                  padding: '8px 0',
+                  cursor: 'pointer',
+                  borderRadius: 4
+                }}
+                onClick={logout}
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </header>
       <div className="w-full bg-gradient-to-br from-gray-50 to-teal-50/30 p-4 md:p-6" style={{paddingTop: '72px'}}>
         <div className="max-w-4xl mx-auto">

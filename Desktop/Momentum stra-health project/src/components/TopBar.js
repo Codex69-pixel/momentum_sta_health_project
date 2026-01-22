@@ -83,61 +83,7 @@ export function TopBar({ onMenuToggle, user, onLogout }) {
               <Search className="w-5 h-5 text-white" />
             </button>
 
-            {/* Notifications */}
-            <div className="relative">
-              <button
-                onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-2 hover:bg-teal-500/30 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-white"
-              >
-                <Bell className="w-5 h-5 text-white" />
-                {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
-
-              {/* Notifications Dropdown */}
-              {showNotifications && (
-                <>
-                  <div className="fixed inset-0 z-10" onClick={() => setShowNotifications(false)} />
-                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 z-20 animate-fadeIn">
-                    <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-teal-50 to-white">
-                      <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
-                      {unreadCount > 0 && (
-                        <span className="text-xs text-teal-600 font-medium">{unreadCount} unread</span>
-                      )}
-                    </div>
-                    <div className="max-h-96 overflow-y-auto">
-                      {notifications.map((notif) => (
-                        <div
-                          key={notif.id}
-                          className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer ${
-                            notif.unread ? 'bg-teal-50/50' : ''
-                          }`}
-                        >
-                          <div className="flex items-start space-x-3">
-                            <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                              notif.type === 'alert' ? 'bg-red-500' :
-                              notif.type === 'success' ? 'bg-green-500' : 'bg-teal-500'
-                            }`} />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm text-gray-900 font-medium">{notif.message}</p>
-                              <p className="text-xs text-gray-500 mt-1">{notif.time}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="p-3 border-t border-gray-200">
-                      <button className="w-full text-center text-sm text-teal-600 hover:text-teal-700 font-medium">
-                        View all notifications
-                      </button>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
+           
 
             {/* Settings */}
             <button className="hidden sm:block p-2 hover:bg-teal-500/30 rounded-lg transition-colors">

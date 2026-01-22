@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import {
-  Users, Bed, Cpu, CheckCircle, AlertTriangle,
-  Download, Settings, AlertCircle
-} from 'lucide-react';
+import { User, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
+import { logout } from '../utils/logout';
 
 export function ResourceDashboard() {
-  const [timeRange, setTimeRange] = useState('week');
   const [view, setView] = useState('overview');
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const resources = {
     beds: {
@@ -75,101 +73,93 @@ export function ResourceDashboard() {
   ];
 
   return (
-    <div className="w-full bg-gradient-to-br from-gray-50 to-teal-50/30 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto">
-
-        {/* Header */}
-        <div className="mb-8 animate-fadeIn">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900">Hospital Resources</h1>
-              <p className="text-gray-600">Real-time staff, bed, and equipment management</p>
-            </div>
-            <div className="flex gap-2">
-              <button className="btn btn-secondary flex items-center gap-2">
-                <Download className="w-4 h-4" />
-                Export
+    <div className="w-full bg-gradient-to-br from-gray-50 to-teal-50/30 min-h-screen">
+      {/* Top Bar */}
+      <header style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        zIndex: 1000,
+        background: 'linear-gradient(to right, #14b8a6, #0d9488)',
+        color: '#fff',
+        height: '64px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        padding: '0 24px'
+      }}>
+        <h1 style={{fontWeight: 700, fontSize: '1.3rem', letterSpacing: '0.01em', margin: 0}}>Hospital Resources</h1>
+        <div style={{position: 'relative', display: 'flex', alignItems: 'center'}}>
+          <button
+            style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0, marginLeft: 16}}
+            onClick={() => setShowDropdown(prev => !prev)}
+            aria-label="User menu"
+          >
+            <User size={28} />
+          </button>
+          {showDropdown && (
+            <div style={{
+              position: 'absolute',
+              right: 0,
+              top: 'calc(100% + 8px)',
+              background: '#fff',
+              color: '#222',
+              borderRadius: 8,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+              minWidth: 180,
+              zIndex: 100,
+              padding: 8
+            }}>
+              <button
+                style={{
+                  width: '100%',
+                  background: 'none',
+                  border: 'none',
+                  color: '#0d9488',
+                  fontWeight: 600,
+                  fontSize: 16,
+                  padding: '8px 0',
+                  cursor: 'pointer',
+                  borderRadius: 4,
+                  textAlign: 'left'
+                }}
+                onClick={() => setView('overview')}
+              >
+                Hospital Resources
               </button>
-              <button className="btn btn-secondary flex items-center gap-2">
-                <Settings className="w-4 h-4" />
+              <button
+                style={{
+                  width: '100%',
+                  background: 'none',
+                  border: 'none',
+                  color: '#0d9488',
+                  fontWeight: 600,
+                  fontSize: 16,
+                  padding: '8px 0',
+                  cursor: 'pointer',
+                  borderRadius: 4,
+                  textAlign: 'left'
+                }}
+                onClick={() => logout()}
+              >
+                Logout
               </button>
             </div>
-          </div>
+          )}
         </div>
-
-        {/* Time Range Selector */}
-        <div className="mb-8 flex gap-2">
-          {['today', 'week', 'month'].map(range => (
-            <button
-              key={range}
-              onClick={() => setTimeRange(range)}
-              className={`px-4 py-2 rounded-lg font-medium transition-all capitalize ${
-                timeRange === range
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
-              }`}
-            >
-              {range}
-            </button>
-          ))}
-        </div>
-
-        {/* Main Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* Beds */}
-          <div className="stat-card group">
-            <div className="flex items-center justify-between mb-4">
-              <Bed className="w-8 h-8 text-blue-600" />
-              <span className="text-sm font-bold text-green-600">{resources.beds.trend}</span>
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Hospital Beds</h3>
-            <p className="text-3xl font-bold text-blue-600 mb-3">{resources.beds.occupied}/{resources.beds.total}</p>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-              <div 
-                className="bg-gradient-to-r from-teal-500 to-teal-600 h-2.5 rounded-full transition-all"
-                style={{width: `${(resources.beds.occupied/resources.beds.total)*100}%`}}
-              ></div>
-            </div>
-            <p className="text-sm text-gray-600">{resources.beds.available} beds available</p>
-          </div>
-
-          {/* Staff */}
-          <div className="stat-card group">
-            <div className="flex items-center justify-between mb-4">
-              <Users className="w-8 h-8 text-emerald-600" />
-              <span className="text-sm font-bold text-red-600">{resources.staff.trend}</span>
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Staff Available</h3>
-            <p className="text-3xl font-bold text-emerald-600 mb-3">{resources.staff.available}/{resources.staff.total}</p>
-            <div className="flex gap-2 text-sm">
-              <span className="text-gray-600"><span className="font-bold text-orange-600">{resources.staff.onLeave}</span> on leave</span>
-              <span className="text-gray-600"><span className="font-bold text-red-600">{resources.staff.sick}</span> sick</span>
-            </div>
-          </div>
-
-          {/* Equipment */}
-          <div className="stat-card group">
-            <div className="flex items-center justify-between mb-4">
-              <Cpu className="w-8 h-8 text-purple-600" />
-              <span className="text-sm font-bold text-green-600">{resources.equipment.trend}</span>
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Equipment Status</h3>
-            <p className="text-3xl font-bold text-purple-600 mb-3">{resources.equipment.operational}/{resources.equipment.total}</p>
-            <div className="flex gap-2 text-sm">
-              <span className="text-gray-600"><span className="font-bold text-orange-600">{resources.equipment.maintenance}</span> maintenance</span>
-              <span className="text-gray-600"><span className="font-bold text-red-600">{resources.equipment.broken}</span> broken</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Alerts & Warnings */}
+      </header>
+      
+      <div className="max-w-7xl mx-auto" style={{paddingTop: '88px', padding: '24px'}}>
+        {/* Alerts Section */}
         {scheduleAlerts.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             {scheduleAlerts.map(alert => {
               const severityColors = {
-                high: 'from-red-50 border-red-200 bg-red-50',
-                medium: 'from-yellow-50 border-yellow-200 bg-yellow-50',
-                low: 'from-teal-50 border-teal-200 bg-teal-50'
+                high: 'bg-gradient-to-r from-red-50 to-red-50/50 border-red-200',
+                medium: 'bg-gradient-to-r from-yellow-50 to-yellow-50/50 border-yellow-200',
+                low: 'bg-gradient-to-r from-teal-50 to-teal-50/50 border-teal-200'
               };
               const iconColors = {
                 high: 'text-red-600',

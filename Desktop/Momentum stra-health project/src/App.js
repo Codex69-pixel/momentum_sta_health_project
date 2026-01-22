@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { LoginScreen } from './components/LoginScreen';
 import { NurseTriage } from './components/NurseTriage';
-import { QueueManagement } from './components/QueueManagement';
+import QueueManagement from './components/QueueManagement';
 import { ResourceDashboard } from './components/ResourceDashboard';
 import { DoctorPortal } from './components/DoctorPortal';
 import { InventoryManagement } from './components/InventoryManagement';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
-import { TopBar } from './components/TopBar';
 
 
 export default function App() {
@@ -38,11 +37,6 @@ export default function App() {
 
   return (
     <div className="h-screen w-full flex flex-col bg-gray-50">
-      <TopBar 
-        onMenuToggle={() => setSidebarOpen(!sidebarOpen)} 
-        user={user}
-        onLogout={handleLogout}
-      />
       
 
       

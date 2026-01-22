@@ -111,7 +111,7 @@ export function AnalyticsDashboard() {
                       style={{width: `${(item.value / 60) * 100}%`}}
                     ></div>
                   </div>
-                  <p className="text-xs text-gray-600 mt-2">{item.unit}</p>
+                  <p className="text-gray-600 mt-2">{item.unit}</p>
                 </div>
               ))}
             </div>

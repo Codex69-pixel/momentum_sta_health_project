@@ -79,7 +79,7 @@ export function Navigation({ currentScreen, onNavigate, user, onLogout }) {
             </div>
             <div>
               <span className="text-xl font-bold text-gray-900">STRA.System</span>
-              <p className="text-xs text-gray-500 hidden sm:block">Healthcare Management</p>
+              <p className="text-gray-500 hidden sm:block">Healthcare Management</p>
             </div>
           </div>
 
@@ -106,15 +106,6 @@ export function Navigation({ currentScreen, onNavigate, user, onLogout }) {
 
           {/* User Info & Actions (Desktop) */}
           <div className="hidden lg:flex items-center space-x-4">
-            {/* Notifications - Placeholder for future implementation */}
-            <button 
-              className="relative p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-              title="Notifications"
-            >
-              <Bell className="w-5 h-5" />
-              {/* Notification badge - example */}
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
             
             {/* User info and logout */}
             <div className="flex items-center space-x-3 pl-3 border-l border-gray-200">
