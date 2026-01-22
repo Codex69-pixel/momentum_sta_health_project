@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import {
-  Package, Plus, AlertTriangle, CheckCircle, Clock, TrendingUp,
-  Search, Filter, Download, Pill, MoreVertical,
-  AlertCircle, ShoppingCart, BarChart3
+import { 
+  User, ChevronDown, LogOut, Home, BarChart3, Package, Plus, 
+  AlertTriangle, CheckCircle, Clock, TrendingUp, Search, Filter, 
+  Download, Pill, MoreVertical, AlertCircle, ShoppingCart, Menu, X
 } from 'lucide-react';
 
 export function InventoryManagement() {
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const drugs = [
     { id: 1, name: 'Paracetamol 500mg', category: 'Pain Relief', stock: 450, reorderLevel: 100, supplier: 'PharmaCorp', cost: 2.50, expiry: '2025-12-31', status: 'optimal', usage: 15 },
@@ -44,209 +46,319 @@ export function InventoryManagement() {
     }
   };
 
+  const handleLogout = () => {
+    setShowUserMenu(false);
+    window.location.href = '/';
+  };
+
   return (
-    <div className="w-full bg-gradient-to-br from-gray-50 to-teal-50/30 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto">
-
-        {/* Header */}
-        <div className="mb-8 animate-fadeIn">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Pharmacy Inventory</h1>
-          <p className="text-gray-600">Real-time medication stock management and alerts</p>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="stat-card">
-            <div className="flex items-center justify-between mb-3">
-              <Package className="w-8 h-8 text-blue-600" />
-        </div>
-            </div>
-            <p className="text-gray-700 font-semibold">Total Stock Items</p>
-            <p className="text-gray-500 text-sm">All medications</p>
-          </div>
-
-          <div className="stat-card">
-            <div className="flex items-center justify-between mb-3">
-              <AlertTriangle className="w-8 h-8 text-red-600" />
-              <span className="text-2xl font-bold text-red-600">{stats.critical}</span>
-            </div>
-            <p className="text-gray-700 font-semibold">Critical Stock</p>
-            <p className="text-gray-500 text-sm">Needs immediate action</p>
-          </div>
-
-          <div className="stat-card">
-            <div className="flex items-center justify-between mb-3">
-              <ShoppingCart className="w-8 h-8 text-amber-600" />
-              <span className="text-2xl font-bold text-amber-600">{stats.reorderNeeded}</span>
-            </div>
-            <p className="text-gray-700 font-semibold">Reorder Needed</p>
-            <p className="text-gray-500 text-sm">Below reorder level</p>
-          </div>
-
-          <div className="stat-card">
-            <div className="flex items-center justify-between mb-3">
-              <BarChart3 className="w-8 h-8 text-emerald-600" />
-              <span className="text-lg font-bold text-emerald-600">KES {(stats.totalValue/1000).toFixed(1)}k</span>
-            </div>
-            <p className="text-gray-700 font-semibold">Inventory Value</p>
-            <p className="text-gray-500 text-sm">Total stock worth</p>
-          </div>
-        </div>
-
-        {/* Controls & Filters */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8">
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search medications or suppliers..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
-              />
-            </div>
-            <button className="btn btn-secondary flex items-center gap-2">
-              <Filter className="w-4 h-4" />
-              Filter
-            </button>
-            <button className="btn btn-secondary flex items-center gap-2">
-              <Download className="w-4 h-4" />
-              Export
-            </button>
-            <button className="btn btn-primary flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              Add Medication
-            </button>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                selectedCategory === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-teal-50/30">
+      {/* Fixed TopBar with proper z-index */}
+    <header className="w-full shadow-lg fixed top-0 left-0 z-50 border-b border-teal-800" style={{background: '#14B8A6'}}>
+        <div className="max-w-7xl mx-auto flex items-center justify-between h-16 px-4 md:px-6">
+          {/* Left: Logo/Brand and Mobile Menu Button */}
+          <div className="flex items-center space-x-3">
+            <button 
+              className="md:hidden p-2 rounded-lg hover:bg-teal-500/30"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
-              All Categories
+              {mobileMenuOpen ? (
+                <X className="w-5 h-5 text-white" />
+              ) : (
+                <Menu className="w-5 h-5 text-white" />
+              )}
             </button>
-            {categories.map(cat => (
+            <span className="text-lg md:text-2xl font-bold text-white tracking-tight">Stra-Health Pharmacy</span>
+          </div>
+
+          {/* Center: Navigation Buttons - Desktop */}
+          <nav className="hidden md:flex items-center space-x-4">
+            <button 
+              className="px-4 py-2 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition"
+              onClick={() => window.location.href = '/pharmacy/home'}
+            >
+              <Home className="inline w-5 h-5 mr-1" /> Home
+            </button>
+            <button 
+              className="px-4 py-2 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition"
+              onClick={() => window.location.href = '/pharmacy/analytics'}
+            >
+              <BarChart3 className="inline w-5 h-5 mr-1" /> Analytics
+            </button>
+          </nav>
+
+          {/* Right: User Icon & Dropdown */}
+          <div className="relative">
+            <button
+              className="flex items-center space-x-2 p-2 hover:bg-teal-500/30 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-white"
+              onClick={() => setShowUserMenu(!showUserMenu)}
+            >
+              <div className="w-8 h-8 bg-white/20 border border-white/30 rounded-full flex items-center justify-center">
+                <User className="w-5 h-5 text-white" />
+              </div>
+              <ChevronDown className={`w-4 h-4 text-white/60 transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {/* User Dropdown Menu */}
+            {showUserMenu && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setShowUserMenu(false)}
+                />
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 animate-fadeIn">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center space-x-3 px-4 py-2.5 text-left hover:bg-red-50 transition-colors rounded-lg"
+                  >
+                    <LogOut className="w-4 h-4 text-red-600" />
+                    <span className="text-sm text-red-600 font-medium">Logout</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile Navigation Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-teal-700 border-t border-teal-800 px-4 py-3">
+            <div className="flex flex-col space-y-2">
+              <button 
+                className="w-full text-left px-4 py-3 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition"
+                onClick={() => {
+                  window.location.href = '/pharmacy/home';
+                  setMobileMenuOpen(false);
+                }}
+              >
+                <Home className="inline w-5 h-5 mr-2" /> Home
+              </button>
+              <button 
+                className="w-full text-left px-4 py-3 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition"
+                onClick={() => {
+                  window.location.href = '/pharmacy/analytics';
+                  setMobileMenuOpen(false);
+                }}
+              >
+                <BarChart3 className="inline w-5 h-5 mr-2" /> Analytics
+              </button>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Main Content - Adjusted for fixed TopBar */}
+      <div className="w-full pt-20 p-4 md:p-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-8 animate-fadeIn">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Pharmacy Inventory</h1>
+            <p className="text-gray-600">Real-time medication stock management and alerts</p>
+          </div>
+
+          {/* Stats Cards - Responsive */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-3">
+                <Package className="w-8 h-8 text-blue-600" />
+                <span className="text-2xl font-bold text-blue-600">{stats.total}</span>
+              </div>
+              <p className="text-gray-700 font-semibold">Total Stock Items</p>
+              <p className="text-gray-500 text-sm">All medications</p>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-3">
+                <AlertTriangle className="w-8 h-8 text-red-600" />
+                <span className="text-2xl font-bold text-red-600">{stats.critical}</span>
+              </div>
+              <p className="text-gray-700 font-semibold">Critical Stock</p>
+              <p className="text-gray-500 text-sm">Needs immediate action</p>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-3">
+                <ShoppingCart className="w-8 h-8 text-amber-600" />
+                <span className="text-2xl font-bold text-amber-600">{stats.reorderNeeded}</span>
+              </div>
+              <p className="text-gray-700 font-semibold">Reorder Needed</p>
+              <p className="text-gray-500 text-sm">Below reorder level</p>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-3">
+                <BarChart3 className="w-8 h-8 text-emerald-600" />
+                <span className="text-lg font-bold text-emerald-600">KES {(stats.totalValue/1000).toFixed(1)}k</span>
+              </div>
+              <p className="text-gray-700 font-semibold">Inventory Value</p>
+              <p className="text-gray-500 text-sm">Total stock worth</p>
+            </div>
+          </div>
+
+          {/* Controls & Filters */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-8">
+            <div className="flex flex-col md:flex-row gap-4 mb-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search medications or suppliers..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                  <Filter className="w-4 h-4" />
+                  Filter
+                </button>
+                <button className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                  <Download className="w-4 h-4" />
+                  Export
+                </button>
+                <button className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                  <Plus className="w-4 h-4" />
+                  Add Medication
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => setSelectedCategory('all')}
                 className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                  selectedCategory === cat
-                    ? 'bg-teal-600 text-white'
+                  selectedCategory === 'all'
+                    ? 'bg-blue-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                {cat}
+                All Categories
               </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Medications Table */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Medication</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Category</th>
-                  <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Current Stock</th>
-                  <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Reorder Level</th>
-                  <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Usage/Day</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Supplier</th>
-                  <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Status</th>
-                  <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredDrugs.map((drug, idx) => {
-                  const StatusIcon = getStatusBadge(drug.status).icon;
-                  return (
-                    <tr key={drug.id} className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white">
-                            <Pill className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-900">{drug.name}</p>
-                            <p className="text-xs text-gray-500">ID: MED-{String(drug.id).padStart(4, '0')}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-gray-700">{drug.category}</td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="inline-block px-3 py-1 bg-teal-100 text-teal-800 rounded-lg font-bold">{drug.stock}</span>
-                      </td>
-                      <td className="px-6 py-4 text-center text-gray-700">{drug.reorderLevel}</td>
-                      <td className="px-6 py-4 text-center">
-                        <div className="flex items-center justify-center gap-2 text-gray-700">
-                          <TrendingUp className="w-4 h-4 text-orange-600" />
-                          {drug.usage} units
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-gray-700">{drug.supplier}</td>
-                      <td className="px-6 py-4 text-center">
-                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg font-medium ${getStatusBadge(drug.status).bg} ${getStatusBadge(drug.status).text}`}>
-                          <StatusIcon className="w-4 h-4" />
-                          {drug.status.charAt(0).toUpperCase() + drug.status.slice(1)}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <button className="inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-200 transition-colors">
-                          <MoreVertical className="w-4 h-4 text-gray-600" />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Expiry Alerts */}
-        <div className="mt-8 grid md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-orange-600" />
-              Expiring Soon (30 days)
-            </h3>
-            <div className="space-y-3">
-              {drugs.filter(d => d.expiry).slice(0, 4).map(drug => (
-                <div key={drug.id} className="p-3 bg-orange-50 rounded-lg border border-orange-200">
-                  <div className="flex justify-between items-start mb-1">
-                    <p className="font-semibold text-gray-900">{drug.name}</p>
-                    <span className="text-xs bg-orange-200 text-orange-800 px-2 py-1 rounded">{drug.expiry}</span>
-                  </div>
-                  <p className="text-sm text-gray-600">Stock: {drug.stock} units</p>
-                </div>
+              {categories.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                    selectedCategory === cat
+                      ? 'bg-teal-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {cat}
+                </button>
               ))}
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <ShoppingCart className="w-5 h-5 text-blue-600" />
-              Pending Reorders
-            </h3>
-            <div className="space-y-3">
-              {drugs.filter(d => d.stock <= d.reorderLevel).map(drug => (
-                <div key={drug.id} className="p-3 bg-teal-50 rounded-lg border border-teal-200">
-                  <div className="flex justify-between items-start mb-1">
-                    <p className="font-semibold text-gray-900">{drug.name}</p>
-                    <span className="text-xs bg-teal-200 text-teal-800 px-2 py-1 rounded">{drug.supplier}</span>
-                  </div>
-                  <p className="text-sm text-gray-600">Current: {drug.stock} | Needed: {drug.reorderLevel - drug.stock} units</p>
-                </div>
-              ))}
+          {/* Medications Table - Responsive */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden mb-8">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[800px]">
+                <thead>
+                  <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Medication</th>
+                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Category</th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Current Stock</th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Reorder Level</th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Usage/Day</th>
+                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Supplier</th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Status</th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredDrugs.map((drug, idx) => {
+                    const StatusIcon = getStatusBadge(drug.status).icon;
+                    return (
+                      <tr key={drug.id} className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white">
+                              <Pill className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-gray-900">{drug.name}</p>
+                              <p className="text-gray-500">ID: MED-{String(drug.id).padStart(4, '0')}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-gray-700">{drug.category}</td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="inline-block px-3 py-1 bg-teal-100 text-teal-800 rounded-lg font-bold">{drug.stock}</span>
+                        </td>
+                        <td className="px-6 py-4 text-center text-gray-700">{drug.reorderLevel}</td>
+                        <td className="px-6 py-4 text-center">
+                          <div className="flex items-center justify-center gap-2 text-gray-700">
+                            <TrendingUp className="w-4 h-4 text-orange-600" />
+                            {drug.usage} units
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-gray-700">{drug.supplier}</td>
+                        <td className="px-6 py-4 text-center">
+                          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-lg font-medium ${getStatusBadge(drug.status).bg} ${getStatusBadge(drug.status).text}`}>
+                            <StatusIcon className="w-4 h-4" />
+                            {drug.status.charAt(0).toUpperCase() + drug.status.slice(1)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <button className="inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-200 transition-colors">
+                            <MoreVertical className="w-4 h-4 text-gray-600" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
+
+          {/* Expiry Alerts */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-orange-600" />
+                Expiring Soon (30 days)
+              </h3>
+              <div className="space-y-3">
+                {drugs.filter(d => {
+                  const expiryDate = new Date(d.expiry);
+                  const today = new Date();
+                  const diffTime = expiryDate.getTime() - today.getTime();
+                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                  return diffDays <= 30 && diffDays > 0;
+                }).slice(0, 4).map(drug => (
+                  <div key={drug.id} className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                    <div className="flex justify-between items-start mb-1">
+                      <p className="font-semibold text-gray-900">{drug.name}</p>
+                      <span className="text-xs bg-orange-200 text-orange-800 px-2 py-1 rounded">{drug.expiry}</span>
+                    </div>
+                    <p className="text-sm text-gray-600">Stock: {drug.stock} units</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <ShoppingCart className="w-5 h-5 text-blue-600" />
+                Pending Reorders
+              </h3>
+              <div className="space-y-3">
+                {drugs.filter(d => d.stock <= d.reorderLevel).map(drug => (
+                  <div key={drug.id} className="p-3 bg-teal-50 rounded-lg border border-teal-200">
+                    <div className="flex justify-between items-start mb-1">
+                      <p className="font-semibold text-gray-900">{drug.name}</p>
+                      <span className="text-xs bg-teal-200 text-teal-800 px-2 py-1 rounded">{drug.supplier}</span>
+                    </div>
+                    <p className="text-sm text-gray-600">Current: {drug.stock} | Needed: {Math.max(0, drug.reorderLevel - drug.stock)} units</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
