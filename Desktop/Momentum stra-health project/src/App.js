@@ -7,7 +7,7 @@ import { DoctorPortal } from './components/DoctorPortal';
 import { InventoryManagement } from './components/InventoryManagement';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
 import { TopBar } from './components/TopBar';
-import { Sidebar } from './components/Sidebar';
+
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState('login');
@@ -44,14 +44,7 @@ export default function App() {
         onLogout={handleLogout}
       />
       
-      <Sidebar 
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        currentScreen={currentScreen}
-        onNavigate={setCurrentScreen}
-        user={user}
-        onLogout={handleLogout}
-      />
+
       
       <main className="flex-1 overflow-auto w-full bg-gray-50">
         {currentScreen === 'nurse' && <NurseTriage />}

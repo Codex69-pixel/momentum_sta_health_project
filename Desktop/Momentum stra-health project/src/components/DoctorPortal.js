@@ -1,5 +1,7 @@
 
 import React, { useState } from 'react';
+import { QueueManagement } from './QueueManagement';
+import { logout } from '../utils/logout';
 import {
   FileText, Pill, TestTube, CheckCircle, Clock, User, Users,
   Heart, Activity, AlertCircle, Calendar, Phone, Mail,
@@ -101,16 +103,22 @@ export function DoctorPortal() {
       <div className="doctor-dashboard-content-area">
         {/* Sidebar Dashboard */}
         <aside className="doctor-dashboard-sidebar">
-          <div style={{ padding: '32px 0', textAlign: 'center', fontWeight: 600, fontSize: '1.1rem', color: '#0d9488', borderBottom: '1px solid #e5e7eb' }}>
-            Dashboard
-          </div>
           <nav style={{ flex: 1, padding: '24px 0' }}>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               <li style={{ padding: '16px 32px', cursor: 'pointer', color: '#333', fontWeight: 500, background: '#e0f7fa', borderRadius: '8px', marginBottom: '8px' }}>Overview</li>
+              <li style={{ padding: '12px 32px', cursor: 'pointer', color: '#0d9488', fontWeight: 500, borderRadius: '8px', marginBottom: '8px', border: '1px solid #14b8a6', background: '#f0fdfa' }}>
+                Queue Management
+              </li>
               <li style={{ padding: '16px 32px', cursor: 'pointer', color: '#333', fontWeight: 500, borderRadius: '8px', marginBottom: '8px' }}>Patients</li>
               <li style={{ padding: '16px 32px', cursor: 'pointer', color: '#333', fontWeight: 500, borderRadius: '8px', marginBottom: '8px' }}>Consultations</li>
               <li style={{ padding: '16px 32px', cursor: 'pointer', color: '#333', fontWeight: 500, borderRadius: '8px', marginBottom: '8px' }}>Appointments</li>
               <li style={{ padding: '16px 32px', cursor: 'pointer', color: '#333', fontWeight: 500, borderRadius: '8px', marginBottom: '8px' }}>Reports</li>
+              <li
+                style={{ padding: '16px 32px', cursor: 'pointer', color: '#e11d48', fontWeight: 500, borderRadius: '8px', marginBottom: '8px', background: '#fef2f2' }}
+                onClick={logout}
+              >
+                Logout
+              </li>
             </ul>
           </nav>
         </aside>
@@ -118,7 +126,8 @@ export function DoctorPortal() {
         {/* Main Content */}
         <main className="doctor-dashboard-main">
           <div className="main-placeholder" style={{ color: '#333', fontWeight: 500, fontSize: '1.2rem' }}>
-            Main Dashboard Content
+            <div>Overview</div>
+            <QueueManagement />
           </div>
         </main>
       </div>

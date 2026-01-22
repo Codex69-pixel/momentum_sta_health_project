@@ -253,6 +253,7 @@
 }
 
 
+
 @media (max-width: 900px) {
   .doctor-dashboard-layout {
     flex-direction: column;
@@ -262,11 +263,53 @@
   }
   .doctor-dashboard-sidebar {
     width: 100%;
-    min-height: 120px;
+    min-height: 60px;
     border: none;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    flex-direction: row;
+    overflow-x: auto;
+    align-items: center;
+    padding: 0 8px;
+  }
+  .doctor-dashboard-sidebar nav ul {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .doctor-dashboard-sidebar nav ul li {
+    margin-bottom: 0;
+    margin-right: 8px;
+    padding: 12px 10px;
+    font-size: 0.95rem;
+    min-width: 80px;
+    text-align: center;
   }
   .doctor-dashboard-main {
-    padding: 12px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .doctor-dashboard-topbar {
+    height: 48px;
+    padding: 0 10px;
+    font-size: 1rem;
+  }
+  .doctor-dashboard-sidebar nav ul li {
+    padding: 8px 4px;
+    font-size: 0.85rem;
+    min-width: 60px;
+  }
+  .doctor-dashboard-main {
+    padding: 4px;
+    font-size: 0.95rem;
+  }
+  .main-placeholder {
+    font-size: 1rem;
+    margin-top: 24px;
   }
 }

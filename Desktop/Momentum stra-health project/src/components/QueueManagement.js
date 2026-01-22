@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './QueueManagement.css';
 import { 
   Clock, Users, AlertCircle, CheckCircle,
   Filter, Search, MoreVertical, Phone, MapPin,

@@ -180,41 +180,37 @@ export function NurseTriage() {
   };
 
   return (
-    <div className="w-full bg-gradient-to-br from-gray-50 to-teal-50/30 p-4 md:p-6">
-      <div className="max-w-4xl mx-auto">
-        
-        {/* Header */}
-        <div className="mb-8 animate-fadeIn">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Nurse Triage Assessment</h1>
-          <p className="text-gray-600">Complete 5-step patient assessment for optimal care</p>
-        </div>
-
-        {/* Progress Indicator */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-semibold text-gray-700">Step {step} of 5</span>
-            <span className="text-sm font-semibold text-blue-600">{Math.round((step/5)*100)}%</span>
+    <>
+      {/* Fixed TopBar for Nurse Triage */}
+      <header style={{position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 50, background: 'linear-gradient(to right, #14b8a6, #0d9488)', color: '#fff', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.04)'}}>
+        <h1 style={{fontWeight: 700, fontSize: '1.3rem', letterSpacing: '0.01em'}}>Nurses Stra-Health Triage</h1>
+      </header>
+      <div className="w-full bg-gradient-to-br from-gray-50 to-teal-50/30 p-4 md:p-6" style={{paddingTop: '72px'}}>
+        <div className="max-w-4xl mx-auto">
+          {/* Progress Indicator */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold text-gray-700">Step {step} of 5</span>
+              <span className="text-sm font-semibold text-blue-600">{Math.round((step/5)*100)}%</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              {[1,2,3,4,5].map((s) => (
+                <div key={s} className="flex-1">
+                  <button
+                    onClick={() => s < step && setStep(s)}
+                    className={`w-full h-2 rounded-full transition-all duration-300 ${
+                      s <= step ? 'bg-gradient-to-r from-teal-600 to-teal-700' : 'bg-gray-200'
+                    }`}
+                    disabled={s > step}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex items-center space-x-2">
-            {[1,2,3,4,5].map((s) => (
-              <div key={s} className="flex-1">
-                <button
-                  onClick={() => s < step && setStep(s)}
-                  className={`w-full h-2 rounded-full transition-all duration-300 ${
-                    s <= step ? 'bg-gradient-to-r from-teal-600 to-teal-700' : 'bg-gray-200'
-                  }`}
-                  disabled={s > step}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Step Content */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 md:p-8 animate-fadeIn">
-          
-          {/* Step 1: Demographics */}
-          {step === 1 && (
+          {/* Step Content */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 md:p-8 animate-fadeIn">
+            {/* Step 1: Demographics */}
+            {step === 1 && (
             <div className="space-y-6">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center mb-6">
                 <User className="w-6 h-6 mr-2 text-blue-600" />
@@ -646,5 +642,6 @@ export function NurseTriage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
