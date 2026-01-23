@@ -69,56 +69,59 @@ export function Navigation({ currentScreen, onNavigate, user, onLogout }) {
   const visibleMenuItems = menuItems.filter(item => item.roles.includes(user?.role));
 
   return (
-    <nav className="bg-white shadow-lg fixed w-full top-0 z-50 border-b-2 border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <div className="grid grid-cols-[auto,1fr,auto] items-center gap-4 lg:gap-8">
+    <nav className="bg-gradient-to-r from-teal-600 to-teal-700 shadow-lg fixed w-full top-0 z-50 border-b border-teal-800">
+      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <div className="flex items-center justify-between gap-4">
           {/* Logo and Brand */}
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 bg-white/20 border border-white/30 rounded-xl flex items-center justify-center shadow-md">
               <Activity className="w-6 h-6 text-white" />
             </div>
-            <div>
-              <span className="text-xl font-bold text-gray-900">STRA.System</span>
-              <p className="text-gray-500 hidden sm:block">Healthcare Management</p>
+            <div className="flex flex-col">
+              <span className="text-lg font-bold text-white leading-tight">STRA-Health</span>
+              <p className="text-xs text-teal-100 font-medium">Medical System</p>
             </div>
           </div>
 
-          {/* Desktop Menu - Dropdown */}
-          <div className="hidden lg:flex justify-center">
-            <select
-              value={currentScreen}
-              onChange={(e) => onNavigate(e.target.value)}
-              className="w-full max-w-xs px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 font-medium text-gray-700 appearance-none bg-white cursor-pointer"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232563eb' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 1rem center',
-                paddingRight: '2.5rem'
-              }}
-            >
-              {visibleMenuItems.map((item) => (
-                <option key={item.id} value={item.id}>
+          {/* Desktop Menu - Horizontal */}
+          <div className="hidden lg:flex items-center gap-2">
+            {visibleMenuItems.map((item) => {
+              const IconComponent = item.icon;
+              const isActive = currentScreen === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => onNavigate(item.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-white/60 ${
+                    isActive
+                      ? 'bg-white/20 text-white shadow-md scale-105'
+                      : 'text-teal-100 hover:bg-white/10 hover:text-white'
+                  }`}
+                  aria-current={isActive ? 'page' : undefined}
+                  title={item.description}
+                >
+                  <IconComponent className="w-5 h-5 mr-1" />
                   {item.label}
-                </option>
-              ))}
-            </select>
+                </button>
+              );
+            })}
           </div>
 
           {/* User Info & Actions (Desktop) */}
           <div className="hidden lg:flex items-center space-x-4">
-            
-            {/* User info and logout */}
-            <div className="flex items-center space-x-3 pl-3 border-l border-gray-200">
-              <div className="text-right">
-                <p className="text-gray-900 font-semibold text-sm">{user?.name}</p>
-                <p className="text-gray-500 text-xs capitalize flex items-center justify-end">
-                  <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
-                  {user?.role}
-                </p>
+            <div className="flex items-center space-x-3 pl-3 border-l border-teal-300">
+              <div className="w-8 h-8 bg-white/20 border border-white/30 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm font-semibold">
+                  {user?.name?.charAt(0).toUpperCase() || 'U'}
+                </span>
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="text-sm font-semibold text-white">{user?.name || 'User'}</span>
+                <span className="text-xs text-teal-100 capitalize">{user?.role || 'Role'}</span>
               </div>
               <button
                 onClick={onLogout}
-                className="flex items-center space-x-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors border-2 border-red-200 hover:border-red-300 font-medium"
+                className="flex items-center space-x-2 px-3 py-2 text-red-100 hover:bg-red-50/10 rounded-lg transition-colors border-2 border-red-200 hover:border-red-300 font-medium"
                 title="Logout"
               >
                 <LogOut className="w-4 h-4" />
@@ -130,7 +133,7 @@ export function Navigation({ currentScreen, onNavigate, user, onLogout }) {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="lg:hidden p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? (
@@ -143,42 +146,48 @@ export function Navigation({ currentScreen, onNavigate, user, onLogout }) {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden mt-4 pb-4 border-t border-gray-200 pt-4 animate-slideDown">
-            <div className="mb-4">
-              <select
-                value={currentScreen}
-                onChange={(e) => {
-                  onNavigate(e.target.value);
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 font-medium text-gray-700 appearance-none bg-white cursor-pointer"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232563eb' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 1rem center',
-                  paddingRight: '2.5rem'
-                }}
-              >
-                {visibleMenuItems.map((item) => (
-                  <option key={item.id} value={item.id}>
+          <div className="lg:hidden mt-4 pb-4 border-t border-teal-200 pt-4 animate-slideDown">
+            <div className="flex flex-col gap-2 mb-4">
+              {visibleMenuItems.map((item) => {
+                const IconComponent = item.icon;
+                const isActive = currentScreen === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      onNavigate(item.id);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors text-base focus:outline-none focus:ring-2 focus:ring-teal-400 ${
+                      isActive
+                        ? 'bg-white/20 text-white shadow-md scale-105'
+                        : 'text-teal-100 hover:bg-white/10 hover:text-white'
+                    }`}
+                    aria-current={isActive ? 'page' : undefined}
+                    title={item.description}
+                  >
+                    <IconComponent className="w-5 h-5 mr-1" />
                     {item.label}
-                  </option>
-                ))}
-              </select>
+                  </button>
+                );
+              })}
             </div>
-            
             {/* Mobile user info and logout */}
-            <div className="border-t border-gray-200 pt-4 space-y-3">
-              <div className="px-4">
-                <p className="text-gray-900 font-semibold">{user?.name}</p>
-                <p className="text-gray-600 text-sm capitalize flex items-center">
-                  <span className="w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
-                  {user?.role}
-                </p>
+            <div className="border-t border-teal-200 pt-4 space-y-3">
+              <div className="flex items-center space-x-3 px-4">
+                <div className="w-8 h-8 bg-white/20 border border-white/30 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-semibold">
+                    {user?.name?.charAt(0).toUpperCase() || 'U'}
+                  </span>
+                </div>
+                <div className="flex flex-col items-start">
+                  <span className="text-sm font-semibold text-white">{user?.name || 'User'}</span>
+                  <span className="text-xs text-teal-100 capitalize">{user?.role || 'Role'}</span>
+                </div>
               </div>
               <button
                 onClick={onLogout}
-                className="w-full flex items-center space-x-2 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors border-2 border-red-200 font-medium"
+                className="w-full flex items-center space-x-2 px-4 py-3 text-red-100 hover:bg-red-50/10 rounded-lg transition-colors border-2 border-red-200 font-medium"
               >
                 <LogOut className="w-5 h-5" />
                 <span>Logout</span>
@@ -187,7 +196,6 @@ export function Navigation({ currentScreen, onNavigate, user, onLogout }) {
           </div>
         )}
       </div>
-      
       {/* Add animation styles */}
       <style>{`
         @keyframes slideDown {

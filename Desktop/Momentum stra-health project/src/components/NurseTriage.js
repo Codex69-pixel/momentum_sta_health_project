@@ -5,10 +5,11 @@ import {
   CheckCircle, ArrowRight, ArrowLeft,
   Thermometer, Zap, Droplet, Wind, Gauge, Ruler
 } from 'lucide-react';
+import LoadingSpinner from './common/LoadingSpinner';
 
-export function NurseTriage() {
+export function NurseTriage({ onNavigate }) {
   const [step, setStep] = useState(1);
-  const [showLogout, setShowLogout] = useState(false);
+        const [showLogout, setShowLogout] = useState(false);
   const [formData, setFormData] = useState({
     // Step 1: Demographics
     name: '',
@@ -48,8 +49,24 @@ export function NurseTriage() {
     // Step 5: Review
     triageNotes: ''
   });
+        {/* Quick navigation dropdown for modules */}
+        {onNavigate && (
+          <select
+            style={{ marginLeft: 24, padding: '6px 12px', borderRadius: 8, border: '1px solid #14b8a6', background: '#fff', color: '#0d9488', fontWeight: 600 }}
+            onChange={e => onNavigate(e.target.value)}
+            defaultValue=""
+          >
+            <option value="" disabled>Go to module...</option>
+            <option value="queue">Queue Management</option>
+            <option value="doctor">Doctor Portal</option>
+            <option value="resources">Resource Dashboard</option>
+            <option value="inventory">Inventory</option>
+            <option value="analytics">Analytics</option>
+          </select>
+        )}
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const symptoms = [
     'Fever', 'Cough', 'Shortness of Breath', 'Chest Pain', 'Abdominal Pain',
@@ -165,20 +182,26 @@ export function NurseTriage() {
     }
   };
 
-  const handleSubmit = () => {
-    if (validateStep()) {
-      console.log('Submitting form:', formData);
-      alert('Patient registered successfully!\nPatient ID: STRA-' + String(Math.floor(Math.random() * 10000)).padStart(4, '0'));
-      setStep(1);
-      setFormData({
-        name: '', dob: '', gender: '', homePhone: '', mobilePhone: '', email: '',
-        emergencyContactName: '', emergencyContactPhone: '', address: '', city: '',
-        temperature: '', heartRate: '', bloodPressureSystolic: '', bloodPressureDiastolic: '',
-        respiratoryRate: '', spo2: '', height: '', weight: '',
-        chiefComplaint: '', symptoms: [], symptomDuration: '', severity: '',
-        allergies: '', medications: '', pastConditions: [], surgicalHistory: '', familyHistory: '', triageNotes: ''
-      });
-    }
+  // Example: Simulate loading on submit
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      if (validateStep()) {
+        console.log('Submitting form:', formData);
+        alert('Patient registered successfully!\nPatient ID: STRA-' + String(Math.floor(Math.random() * 10000)).padStart(4, '0'));
+        setStep(1);
+        setFormData({
+          name: '', dob: '', gender: '', homePhone: '', mobilePhone: '', email: '',
+          emergencyContactName: '', emergencyContactPhone: '', address: '', city: '',
+          temperature: '', heartRate: '', bloodPressureSystolic: '', bloodPressureDiastolic: '',
+          respiratoryRate: '', spo2: '', height: '', weight: '',
+          chiefComplaint: '', symptoms: [], symptomDuration: '', severity: '',
+          allergies: '', medications: '', pastConditions: [], surgicalHistory: '', familyHistory: '', triageNotes: ''
+        });
+      }
+    }, 1200);
   };
 
   return (
@@ -696,6 +719,9 @@ export function NurseTriage() {
             </button>
           )}
         </div>
+
+        {/* Loading Spinner Example */}
+        {loading && <LoadingSpinner text="Processing..." fullScreen />}
       </div>
     </div>
     </>

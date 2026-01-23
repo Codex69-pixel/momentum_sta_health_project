@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { User, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
 import { logout } from '../utils/logout';
+import LoadingSpinner from './common/LoadingSpinner';
 
-export function ResourceDashboard() {
+export function ResourceDashboard({ onNavigate }) {
   const [view, setView] = useState('overview');
   const [showDropdown, setShowDropdown] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const resources = {
     beds: {
@@ -49,6 +51,21 @@ export function ResourceDashboard() {
       ]
     }
   };
+        {/* Quick navigation dropdown for modules */}
+        {onNavigate && (
+          <select
+            style={{ marginLeft: 24, padding: '6px 12px', borderRadius: 8, border: '1px solid #14b8a6', background: '#fff', color: '#0d9488', fontWeight: 600 }}
+            onChange={e => onNavigate(e.target.value)}
+            defaultValue=""
+          >
+            <option value="" disabled>Go to module...</option>
+            <option value="nurse">Nurse Triage</option>
+            <option value="queue">Queue Management</option>
+            <option value="doctor">Doctor Portal</option>
+            <option value="inventory">Inventory</option>
+            <option value="analytics">Analytics</option>
+          </select>
+        )}
 
   const scheduleAlerts = [
     { id: 1, type: 'shift', title: 'Evening Shift - 3 Vacancies', dept: 'Emergency', time: 'Today 6 PM', severity: 'high' },
@@ -151,7 +168,7 @@ export function ResourceDashboard() {
         </div>
       </header>
       
-      <div className="max-w-7xl mx-auto" style={{paddingTop: '88px', padding: '24px'}}>
+      <div className="max-w-7xl mx-auto" style={{paddingTop: '90px', paddingLeft: '24px', paddingRight: '24px', paddingBottom: '24px'}}>
         {/* Alerts Section */}
         {scheduleAlerts.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -381,6 +398,9 @@ export function ResourceDashboard() {
             </div>
           </div>
         )}
+
+        {/* Loading Spinner Example */}
+        {loading && <LoadingSpinner text="Updating resources..." fullScreen />}
       </div>
     </div>
   );

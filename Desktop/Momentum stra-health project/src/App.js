@@ -6,7 +6,7 @@ import { ResourceDashboard } from './components/ResourceDashboard';
 import { DoctorPortal } from './components/DoctorPortal';
 import { InventoryManagement } from './components/InventoryManagement';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
-
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState('login');
@@ -37,17 +37,17 @@ export default function App() {
 
   return (
     <div className="h-screen w-full flex flex-col bg-gray-50">
-      
-
-      
-      <main className="flex-1 overflow-auto w-full bg-gray-50">
-        {currentScreen === 'nurse' && <NurseTriage />}
-        {currentScreen === 'queue' && <QueueManagement />}
-        {currentScreen === 'resources' && <ResourceDashboard />}
-        {currentScreen === 'doctor' && <DoctorPortal />}
-        {currentScreen === 'inventory' && <InventoryManagement />}
-        {currentScreen === 'analytics' && <AnalyticsDashboard />}
-      </main>
+      {/* Wrap main content in ErrorBoundary */}
+      <ErrorBoundary>
+        <main className="flex-1 overflow-auto w-full bg-gray-50">
+          {currentScreen === 'nurse' && <NurseTriage />}
+          {currentScreen === 'queue' && <QueueManagement />}
+          {currentScreen === 'resources' && <ResourceDashboard />}
+          {currentScreen === 'doctor' && <DoctorPortal />}
+          {currentScreen === 'inventory' && <InventoryManagement />}
+          {currentScreen === 'analytics' && <AnalyticsDashboard />}
+        </main>
+      </ErrorBoundary>
     </div>
   );
 }

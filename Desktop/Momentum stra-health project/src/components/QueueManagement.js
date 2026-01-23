@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { 
   Clock, Users, AlertCircle, CheckCircle, Filter, Search, 
   MoreVertical, Phone, MapPin, AlertTriangle, Activity, 
-  Eye, ChevronRight, ChevronLeft, X
+  Eye, ChevronRight, ChevronLeft, X, Download
 } from 'lucide-react';
 import './QueueManagement.css';
+import LoadingSpinner from './common/LoadingSpinner';
+import Papa from 'papaparse';
+import TablePagination from './common/TablePagination';
 
 // Mock data for the queue
 const mockPatients = [
@@ -51,6 +54,11 @@ const QueueManagement = () => {
   const [urgencyFilter, setUrgencyFilter] = useState('ALL');
   const [showFilters, setShowFilters] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [sortKey, setSortKey] = useState('name');
+  const [sortOrder, setSortOrder] = useState('asc');
+  const pageSize = 5;
 
   const getUrgencyConfig = (urgency) => {
     return urgencyConfig[urgency] || urgencyConfig.GREEN;
@@ -94,6 +102,40 @@ const QueueManagement = () => {
     setShowFilters(false);
   };
 
+  // Example: Simulate loading on refresh
+  const handleRefresh = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      // ...refresh logic...
+    }, 1200);
+  };
+
+  const handleExportCSV = () => {
+    const csv = Papa.unparse(filteredPatients.map(patient => ({
+      Name: patient.name,
+      Department: patient.department,
+      Urgency: patient.urgency,
+      Status: patient.status,
+      'Arrival Time': patient.arrivalTime
+    })));
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'queue.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const sortedPatients = [...filteredPatients].sort((a, b) => {
+    if (a[sortKey] < b[sortKey]) return sortOrder === 'asc' ? -1 : 1;
+    if (a[sortKey] > b[sortKey]) return sortOrder === 'asc' ? 1 : -1;
+    return 0;
+  });
+  const pagedPatients = sortedPatients.slice((page-1)*pageSize, page*pageSize);
+
   return (
     <div className="w-full bg-gradient-to-br from-gray-50 to-teal-50/30 p-4 md:p-6 min-h-screen">
       <div className="max-w-7xl mx-auto">
@@ -111,7 +153,10 @@ const QueueManagement = () => {
             >
               {sidebarOpen ? <X className="w-5 h-5" /> : <Filter className="w-5 h-5" />}
             </button>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+            <button 
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              onClick={handleRefresh}
+            >
               Refresh Queue
             </button>
           </div>
@@ -270,8 +315,8 @@ const QueueManagement = () => {
 
             {/* Queue Cards - Responsive Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mb-6">
-              {filteredPatients && filteredPatients.length > 0 ? (
-                filteredPatients.map((patient, idx) => {
+              {pagedPatients && pagedPatients.length > 0 ? (
+                pagedPatients.map((patient, idx) => {
                   const config = getUrgencyConfig(patient.urgency);
                   const Icon = config.icon;
                   return (
@@ -372,6 +417,9 @@ const QueueManagement = () => {
             )}
           </div>
         </div>
+
+        {/* Loading Spinner Example */}
+        {loading && <LoadingSpinner text="Refreshing queue..." fullScreen />}
       </div>
     </div>
   );

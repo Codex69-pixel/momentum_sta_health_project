@@ -1,5 +1,8 @@
+
 import React, { useState } from 'react';
 import { BarChart3, Users, Clock, TrendingUp, Download, Calendar } from 'lucide-react';
+import LoadingSpinner from './common/LoadingSpinner';
+import Papa from 'papaparse';
 
 const mockAnalytics = {
   patientVolume: {
@@ -33,20 +36,62 @@ const mockAnalytics = {
   ]
 };
 
-export function AnalyticsDashboard() {
+function AnalyticsDashboard({ onNavigate }) {
   const [timeframe, setTimeframe] = useState('monthly');
+  const [loading, setLoading] = useState(false);
+
+  // Example: Simulate loading on fetch
+  const handleFetch = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      // ...fetch logic...
+    }, 1200);
+  };
+
+  const handleExportCSV = () => {
+    const csv = Papa.unparse(mockAnalytics.monthlyTrend.map(row => ({
+      Metric: row.month,
+      Value: row.patients,
+      Date: new Date().toLocaleDateString()
+    })));
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'analytics.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="w-full bg-gradient-to-br from-gray-50 to-teal-50/30 p-4 md:p-6">
       <div className="max-w-7xl mx-auto h-full">
-        
+        {/* Navigation Dropdown */}
+        {onNavigate && (
+          <div style={{ margin: '24px 0' }}>
+            <select
+              style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #14b8a6', background: '#fff', color: '#0d9488', fontWeight: 600 }}
+              onChange={e => onNavigate(e.target.value)}
+              defaultValue=""
+            >
+              <option value="" disabled>Go to module...</option>
+              <option value="nurse">Nurse Triage</option>
+              <option value="queue">Queue Management</option>
+              <option value="doctor">Doctor Portal</option>
+              <option value="resources">Resource Dashboard</option>
+              <option value="inventory">Inventory</option>
+            </select>
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 animate-fadeIn">
           <div>
             <h1 className="text-4xl font-bold text-gray-900 mb-2">Analytics Dashboard</h1>
             <p className="text-gray-600">Hospital performance metrics and insights</p>
           </div>
-          
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2 bg-white px-4 py-2 rounded-xl border border-gray-200">
               <Calendar className="w-4 h-4 text-teal-600" />
@@ -60,8 +105,9 @@ export function AnalyticsDashboard() {
                 <option value="monthly">This Month</option>
               </select>
             </div>
-            <button className="p-2.5 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors shadow-md">
-              <Download className="w-5 h-5" />
+            <button className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors" onClick={handleExportCSV}>
+              <Download className="w-4 h-4" />
+              Export
             </button>
           </div>
         </div>
@@ -197,19 +243,16 @@ export function AnalyticsDashboard() {
                   <h3 className="text-lg font-semibold text-gray-900">{resource.label}</h3>
                   <span className="text-3xl">{resource.icon}</span>
                 </div>
-                
                 <div className="mb-4">
                   <div className="text-4xl font-bold text-gray-900">{resource.value}%</div>
                   <p className="text-sm text-gray-600 mt-1">utilization rate</p>
                 </div>
-                
                 <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
                   <div 
                     className={`h-full bg-gradient-to-r ${resource.color}`}
                     style={{width: `${resource.value}%`}}
                   ></div>
                 </div>
-
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   {resource.value > 80 && (
                     <p className="text-sm text-amber-600 font-semibold">⚠️ High utilization - consider expansion</p>
@@ -256,7 +299,13 @@ export function AnalyticsDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Loading Spinner Example */}
+        {loading && <LoadingSpinner text="Loading analytics..." fullScreen />}
       </div>
     </div>
   );
 }
+
+export default AnalyticsDashboard;
+export { AnalyticsDashboard };

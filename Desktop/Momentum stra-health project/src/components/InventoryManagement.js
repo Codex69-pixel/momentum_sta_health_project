@@ -4,12 +4,38 @@ import {
   AlertTriangle, CheckCircle, Clock, TrendingUp, Search, Filter, 
   Download, Pill, MoreVertical, AlertCircle, ShoppingCart, Menu, X
 } from 'lucide-react';
+import LoadingSpinner from './common/LoadingSpinner';
+import Papa from 'papaparse';
 
-export function InventoryManagement() {
+export function InventoryManagement({ onNavigate }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+        const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState({
+    name: '', category: '', stock: '', reorderLevel: '', supplier: '', cost: '', expiry: ''
+  });
+            {/* Quick navigation dropdown for modules */}
+            {onNavigate && (
+              <select
+                style={{ marginLeft: 8, padding: '6px 12px', borderRadius: 8, border: '1px solid #fff', background: '#fff', color: '#0d9488', fontWeight: 600 }}
+                onChange={e => onNavigate(e.target.value)}
+                defaultValue=""
+              >
+                <option value="" disabled>Go to module...</option>
+                <option value="nurse">Nurse Triage</option>
+                <option value="queue">Queue Management</option>
+                <option value="doctor">Doctor Portal</option>
+                <option value="resources">Resource Dashboard</option>
+                <option value="analytics">Analytics</option>
+              </select>
+            )}
+  const [addErrors, setAddErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [sortKey, setSortKey] = useState('name');
+  const [sortOrder, setSortOrder] = useState('asc');
 
   const drugs = [
     { id: 1, name: 'Paracetamol 500mg', category: 'Pain Relief', stock: 450, reorderLevel: 100, supplier: 'PharmaCorp', cost: 2.50, expiry: '2025-12-31', status: 'optimal', usage: 15 },
@@ -38,6 +64,14 @@ export function InventoryManagement() {
     return matchesSearch && matchesCategory;
   });
 
+  const sortedDrugs = [...filteredDrugs].sort((a, b) => {
+    if (a[sortKey] < b[sortKey]) return sortOrder === 'asc' ? -1 : 1;
+    if (a[sortKey] > b[sortKey]) return sortOrder === 'asc' ? 1 : -1;
+    return 0;
+  });
+  const pageSize = 5;
+  const pagedDrugs = sortedDrugs.slice((page-1)*pageSize, page*pageSize);
+
   const getStatusBadge = (status) => {
     switch(status) {
       case 'critical': return { bg: 'bg-red-100', text: 'text-red-800', icon: AlertTriangle };
@@ -49,6 +83,63 @@ export function InventoryManagement() {
   const handleLogout = () => {
     setShowUserMenu(false);
     window.location.href = '/';
+  };
+
+  const validateAddForm = () => {
+    const errors = {};
+    if (!addForm.name) errors.name = 'Name is required';
+    if (!addForm.category) errors.category = 'Category is required';
+    if (!addForm.stock || isNaN(addForm.stock) || addForm.stock < 0) errors.stock = 'Valid stock required';
+    if (!addForm.reorderLevel || isNaN(addForm.reorderLevel) || addForm.reorderLevel < 0) errors.reorderLevel = 'Valid reorder level required';
+    if (!addForm.supplier) errors.supplier = 'Supplier is required';
+    if (!addForm.cost || isNaN(addForm.cost) || addForm.cost < 0) errors.cost = 'Valid cost required';
+    if (!addForm.expiry) errors.expiry = 'Expiry date required';
+    return errors;
+  };
+
+  const handleAddChange = e => {
+    setAddForm({ ...addForm, [e.target.name]: e.target.value });
+    if (addErrors[e.target.name]) setAddErrors({ ...addErrors, [e.target.name]: '' });
+  };
+
+  const handleAddSubmit = e => {
+    e.preventDefault();
+    const errors = validateAddForm();
+    if (Object.keys(errors).length) {
+      setAddErrors(errors);
+      return;
+    }
+    setLoading(true);
+    setTimeout(() => { // Simulate async
+      setShowAddModal(false);
+      setAddForm({ name: '', category: '', stock: '', reorderLevel: '', supplier: '', cost: '', expiry: '' });
+      setAddErrors({});
+      setLoading(false);
+      // Optionally show a success message
+    }, 1200);
+  };
+
+  // Export inventory table to CSV
+  const handleExportCSV = () => {
+    const csv = Papa.unparse(filteredDrugs.map(drug => ({
+      Name: drug.name,
+      Category: drug.category,
+      Stock: drug.stock,
+      'Reorder Level': drug.reorderLevel,
+      Usage: drug.usage,
+      Supplier: drug.supplier,
+      Cost: drug.cost,
+      Expiry: drug.expiry,
+      Status: drug.status
+    })));
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'inventory.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -216,11 +307,11 @@ export function InventoryManagement() {
                   <Filter className="w-4 h-4" />
                   Filter
                 </button>
-                <button className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                <button className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors" onClick={handleExportCSV}>
                   <Download className="w-4 h-4" />
                   Export
                 </button>
-                <button className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                <button className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors" onClick={() => setShowAddModal(true)}>
                   <Plus className="w-4 h-4" />
                   Add Medication
                 </button>
@@ -260,18 +351,32 @@ export function InventoryManagement() {
               <table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Medication</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Category</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Current Stock</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Reorder Level</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Usage/Day</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Supplier</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Status</th>
+                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 cursor-pointer" onClick={() => { setSortKey('name'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); }}>
+                      Medication {sortKey === 'name' && (sortOrder === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 cursor-pointer" onClick={() => { setSortKey('category'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); }}>
+                      Category {sortKey === 'category' && (sortOrder === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-900 cursor-pointer" onClick={() => { setSortKey('stock'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); }}>
+                      Current Stock {sortKey === 'stock' && (sortOrder === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-900 cursor-pointer" onClick={() => { setSortKey('reorderLevel'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); }}>
+                      Reorder Level {sortKey === 'reorderLevel' && (sortOrder === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-900 cursor-pointer" onClick={() => { setSortKey('usage'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); }}>
+                      Usage/Day {sortKey === 'usage' && (sortOrder === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900 cursor-pointer" onClick={() => { setSortKey('supplier'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); }}>
+                      Supplier {sortKey === 'supplier' && (sortOrder === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-900 cursor-pointer" onClick={() => { setSortKey('status'); setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); }}>
+                      Status {sortKey === 'status' && (sortOrder === 'asc' ? '▲' : '▼')}
+                    </th>
                     <th className="px-6 py-4 text-center text-sm font-bold text-gray-900">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredDrugs.map((drug, idx) => {
+                  {pagedDrugs.map((drug, idx) => {
                     const StatusIcon = getStatusBadge(drug.status).icon;
                     return (
                       <tr key={drug.id} className={`border-b border-gray-100 hover:bg-gray-50 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}>
@@ -363,6 +468,58 @@ export function InventoryManagement() {
           </div>
         </div>
       </div>
+
+      {/* Add Medication Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          {loading ? (
+            <LoadingSpinner text="Adding medication..." fullScreen />
+          ) : (
+            <form className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md relative" onSubmit={handleAddSubmit}>
+              <button type="button" className="absolute top-3 right-3 text-gray-400 hover:text-gray-700" onClick={() => setShowAddModal(false)} aria-label="Close">
+                <X className="w-6 h-6" />
+              </button>
+              <h2 className="text-xl font-bold mb-4">Add Medication</h2>
+              <div className="mb-3">
+                <label className="block text-sm font-medium mb-1">Name</label>
+                <input name="name" value={addForm.name} onChange={handleAddChange} className={`w-full border rounded-lg px-3 py-2 ${addErrors.name ? 'border-red-500' : 'border-gray-200'}`} />
+                {addErrors.name && <div className="text-red-600 text-xs mt-1">{addErrors.name}</div>}
+              </div>
+              <div className="mb-3">
+                <label className="block text-sm font-medium mb-1">Category</label>
+                <input name="category" value={addForm.category} onChange={handleAddChange} className={`w-full border rounded-lg px-3 py-2 ${addErrors.category ? 'border-red-500' : 'border-gray-200'}`} />
+                {addErrors.category && <div className="text-red-600 text-xs mt-1">{addErrors.category}</div>}
+              </div>
+              <div className="mb-3">
+                <label className="block text-sm font-medium mb-1">Stock</label>
+                <input name="stock" value={addForm.stock} onChange={handleAddChange} type="number" className={`w-full border rounded-lg px-3 py-2 ${addErrors.stock ? 'border-red-500' : 'border-gray-200'}`} />
+                {addErrors.stock && <div className="text-red-600 text-xs mt-1">{addErrors.stock}</div>}
+              </div>
+              <div className="mb-3">
+                <label className="block text-sm font-medium mb-1">Reorder Level</label>
+                <input name="reorderLevel" value={addForm.reorderLevel} onChange={handleAddChange} type="number" className={`w-full border rounded-lg px-3 py-2 ${addErrors.reorderLevel ? 'border-red-500' : 'border-gray-200'}`} />
+                {addErrors.reorderLevel && <div className="text-red-600 text-xs mt-1">{addErrors.reorderLevel}</div>}
+              </div>
+              <div className="mb-3">
+                <label className="block text-sm font-medium mb-1">Supplier</label>
+                <input name="supplier" value={addForm.supplier} onChange={handleAddChange} className={`w-full border rounded-lg px-3 py-2 ${addErrors.supplier ? 'border-red-500' : 'border-gray-200'}`} />
+                {addErrors.supplier && <div className="text-red-600 text-xs mt-1">{addErrors.supplier}</div>}
+              </div>
+              <div className="mb-3">
+                <label className="block text-sm font-medium mb-1">Cost</label>
+                <input name="cost" value={addForm.cost} onChange={handleAddChange} type="number" step="0.01" className={`w-full border rounded-lg px-3 py-2 ${addErrors.cost ? 'border-red-500' : 'border-gray-200'}`} />
+                {addErrors.cost && <div className="text-red-600 text-xs mt-1">{addErrors.cost}</div>}
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Expiry Date</label>
+                <input name="expiry" value={addForm.expiry} onChange={handleAddChange} type="date" className={`w-full border rounded-lg px-3 py-2 ${addErrors.expiry ? 'border-red-500' : 'border-gray-200'}`} />
+                {addErrors.expiry && <div className="text-red-600 text-xs mt-1">{addErrors.expiry}</div>}
+              </div>
+              <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 transition">Add Medication</button>
+            </form>
+          )}
+        </div>
+      )}
     </div>
   );
 }

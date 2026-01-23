@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import QueueManagement from './QueueManagement';
 import { logout } from '../utils/logout';
@@ -9,6 +8,7 @@ import {
   Printer, Send, Eye, ChevronRight
 } from 'lucide-react';
 import './DoctorPortal.css';
+import LoadingSpinner from './common/LoadingSpinner';
 
 const mockPatients = [
   {
@@ -82,11 +82,11 @@ const mockPatients = [
   }
 ];
 
-export function DoctorPortal() {
+export function DoctorPortal({ onNavigate }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedPatient, setSelectedPatient] = useState(mockPatients[0]);
   const [clinicalNotes, setClinicalNotes] = useState('');
-
+  const [loading, setLoading] = useState(false);
 
   // Top bar content (can be customized)
   const TopBar = () => (
@@ -98,6 +98,20 @@ export function DoctorPortal() {
     </div>
   );
 
+  // Example: Simulate loading on save
+  const handleSave = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      // ...save logic...
+    }, 1200);
+  };
+
+  // Navigation handler for sidebar
+  const handleSidebarNav = (screen) => {
+    if (onNavigate) onNavigate(screen);
+  };
+
   return (
     <div className="doctor-dashboard-layout">
       <TopBar />
@@ -106,13 +120,36 @@ export function DoctorPortal() {
         <aside className="doctor-dashboard-sidebar">
           <nav style={{ flex: 1, padding: '24px 0', marginTop: '64px' }}>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              <li style={{ padding: '12px 32px', cursor: 'pointer', color: '#0d9488', fontWeight: 500, borderRadius: '8px', marginBottom: '8px', border: '1px solid #14b8a6', background: '#f0fdfa' }}>
+              <li
+                style={{ padding: '12px 32px', cursor: 'pointer', color: '#0d9488', fontWeight: 500, borderRadius: '8px', marginBottom: '8px', border: '1px solid #14b8a6', background: '#f0fdfa' }}
+                onClick={() => handleSidebarNav('queue')}
+              >
                 Queue Management
               </li>
-              <li style={{ padding: '16px 32px', cursor: 'pointer', color: '#333', fontWeight: 500, borderRadius: '8px', marginBottom: '8px' }}>Patients</li>
-              <li style={{ padding: '16px 32px', cursor: 'pointer', color: '#333', fontWeight: 500, borderRadius: '8px', marginBottom: '8px' }}>Consultations</li>
-              <li style={{ padding: '16px 32px', cursor: 'pointer', color: '#333', fontWeight: 500, borderRadius: '8px', marginBottom: '8px' }}>Appointments</li>
-              <li style={{ padding: '16px 32px', cursor: 'pointer', color: '#333', fontWeight: 500, borderRadius: '8px', marginBottom: '8px' }}>Reports</li>
+              <li
+                style={{ padding: '16px 32px', cursor: 'pointer', color: '#333', fontWeight: 500, borderRadius: '8px', marginBottom: '8px' }}
+                onClick={() => handleSidebarNav('doctor')}
+              >
+                Patients
+              </li>
+              <li
+                style={{ padding: '16px 32px', cursor: 'pointer', color: '#333', fontWeight: 500, borderRadius: '8px', marginBottom: '8px' }}
+                onClick={() => handleSidebarNav('consultations')}
+              >
+                Consultations
+              </li>
+              <li
+                style={{ padding: '16px 32px', cursor: 'pointer', color: '#333', fontWeight: 500, borderRadius: '8px', marginBottom: '8px' }}
+                onClick={() => handleSidebarNav('appointments')}
+              >
+                Appointments
+              </li>
+              <li
+                style={{ padding: '16px 32px', cursor: 'pointer', color: '#333', fontWeight: 500, borderRadius: '8px', marginBottom: '8px' }}
+                onClick={() => handleSidebarNav('reports')}
+              >
+                Reports
+              </li>
               <li
                 style={{ padding: '16px 32px', cursor: 'pointer', color: '#e11d48', fontWeight: 500, borderRadius: '8px', marginBottom: '8px', background: '#fef2f2' }}
                 onClick={logout}
@@ -128,6 +165,8 @@ export function DoctorPortal() {
           <div className="main-placeholder" style={{ color: '#333', fontWeight: 500, fontSize: '1.2rem' }}>
             <QueueManagement />
           </div>
+          {/* Loading Spinner Example */}
+          {loading && <LoadingSpinner text="Saving..." fullScreen />}
         </main>
       </div>
     </div>
