@@ -9,6 +9,10 @@ import LoadingSpinner from './common/LoadingSpinner';
 
 export function NurseTriage({ onNavigate }) {
   const [step, setStep] = useState(1);
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
+  const [emergencyReason, setEmergencyReason] = useState('');
+  const [emergencyNotes, setEmergencyNotes] = useState('');
+  const [emergencyError, setEmergencyError] = useState('');
         const [showLogout, setShowLogout] = useState(false);
   const [formData, setFormData] = useState({
     // Step 1: Demographics
@@ -49,21 +53,7 @@ export function NurseTriage({ onNavigate }) {
     // Step 5: Review
     triageNotes: ''
   });
-        {/* Quick navigation dropdown for modules */}
-        {onNavigate && (
-          <select
-            style={{ marginLeft: 24, padding: '6px 12px', borderRadius: 8, border: '1px solid #14b8a6', background: '#fff', color: '#0d9488', fontWeight: 600 }}
-            onChange={e => onNavigate(e.target.value)}
-            defaultValue=""
-          >
-            <option value="" disabled>Go to module...</option>
-            <option value="queue">Queue Management</option>
-            <option value="doctor">Doctor Portal</option>
-            <option value="resources">Resource Dashboard</option>
-            <option value="inventory">Inventory</option>
-            <option value="analytics">Analytics</option>
-          </select>
-        )}
+
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -204,6 +194,32 @@ export function NurseTriage({ onNavigate }) {
     }, 1200);
   };
 
+  // Emergency submit handler
+  const handleEmergencySubmit = () => {
+    if (!emergencyReason || (emergencyReason === 'Others' && !emergencyNotes.trim())) {
+      setEmergencyError('Please select a reason and provide notes if "Others".');
+      return;
+    }
+    setEmergencyError('');
+    // Simulate sending to Doctor Portal (replace with API call as needed)
+    const emergencyData = {
+      reason: emergencyReason,
+      notes: emergencyReason === 'Others' ? emergencyNotes : '',
+      timestamp: new Date().toISOString(),
+      nurse: formData.name || 'N/A',
+      phone: formData.mobilePhone || '',
+    };
+    // Here you would send emergencyData to the backend or doctor portal
+    // For now, just alert and reset
+    alert('Emergency sent to Doctor Portal!\nReason: ' + emergencyData.reason + (emergencyData.notes ? ('\nNotes: ' + emergencyData.notes) : ''));
+    setShowEmergencyModal(false);
+    setEmergencyReason('');
+    setEmergencyNotes('');
+    setEmergencyError('');
+    // Optionally, navigate to Doctor Portal
+    if (onNavigate) onNavigate('doctor');
+  };
+
   return (
     <>
       {/* Fixed TopBar for Nurse Triage */}
@@ -223,7 +239,45 @@ export function NurseTriage({ onNavigate }) {
         padding: '0 24px'
       }}>
         <h1 style={{fontWeight: 700, fontSize: '1.3rem', letterSpacing: '0.01em', margin: 0}}>Nurses Stra-Health Triage</h1>
-        <div style={{position: 'relative', display: 'flex', alignItems: 'center'}}>
+        <div style={{position: 'relative', display: 'flex', alignItems: 'center', gap: 12}}>
+          {/* Emergency Button */}
+          <button
+            style={{
+              background: 'linear-gradient(to right, #ef4444, #b91c1c)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 8,
+              padding: '8px 18px',
+              fontWeight: 700,
+              fontSize: 16,
+              marginRight: 8,
+              boxShadow: '0 2px 8px rgba(239,68,68,0.10)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8
+            }}
+            onClick={() => setShowEmergencyModal(true)}
+          >
+            <AlertCircle className="w-5 h-5" style={{marginRight: 4}} /> Emergency
+          </button>
+
+          {/* Quick navigation dropdown for modules */}
+          {onNavigate && (
+            <select
+              style={{ marginLeft: 8, padding: '6px 12px', borderRadius: 8, border: '1px solid #14b8a6', background: '#fff', color: '#0d9488', fontWeight: 600 }}
+              onChange={e => onNavigate(e.target.value)}
+              defaultValue=""
+            >
+              <option value="" disabled>Go to module...</option>
+              <option value="queue">Queue Management</option>
+              <option value="doctor">Doctor Portal</option>
+              <option value="resources">Resource Dashboard</option>
+              <option value="inventory">Inventory</option>
+              <option value="analytics">Analytics</option>
+            </select>
+          )}
+
           <button
             style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0, marginLeft: 16}}
             onClick={() => setShowLogout(prev => !prev)}
@@ -263,6 +317,84 @@ export function NurseTriage({ onNavigate }) {
             </div>
           )}
         </div>
+        {/* Emergency Modal */}
+        {showEmergencyModal && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            background: 'rgba(0,0,0,0.25)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <div style={{
+              background: '#fff',
+              borderRadius: 16,
+              boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+              padding: 32,
+              minWidth: 340,
+              maxWidth: 400,
+              width: '90%',
+              position: 'relative',
+            }}>
+              <h2 style={{fontWeight: 700, fontSize: 22, color: '#b91c1c', marginBottom: 18, display: 'flex', alignItems: 'center', gap: 8}}>
+                <AlertCircle className="w-6 h-6" style={{color: '#b91c1c'}} /> Emergency Override
+              </h2>
+              <p style={{marginBottom: 16, color: '#444'}}>Select the reason for skipping triage forms:</p>
+              <form onSubmit={e => { e.preventDefault(); handleEmergencySubmit(); }}>
+                <div style={{display: 'flex', flexDirection: 'column', gap: 10}}>
+                  {[
+                    'Not Breathing',
+                    'Seizure-current',
+                    'Hypoglycaemia-glucose less than 3',
+                    'Cardiac arrest',
+                    'Obstructive air way-Not breathing',
+                    'Others'
+                  ].map(option => (
+                    <label key={option} style={{display: 'flex', alignItems: 'center', gap: 8, fontWeight: 500, color: '#222'}}>
+                      <input
+                        type="radio"
+                        name="emergencyReason"
+                        value={option}
+                        checked={emergencyReason === option}
+                        onChange={() => { setEmergencyReason(option); if(option !== 'Others') setEmergencyNotes(''); }}
+                        style={{marginRight: 8}}
+                      />
+                      {option}
+                    </label>
+                  ))}
+                </div>
+                {emergencyReason === 'Others' && (
+                  <div style={{marginTop: 14}}>
+                    <textarea
+                      placeholder="Please specify reason..."
+                      value={emergencyNotes}
+                      onChange={e => setEmergencyNotes(e.target.value)}
+                      rows={3}
+                      style={{width: '100%', borderRadius: 8, border: '1px solid #b91c1c', padding: 8, fontSize: 15, marginTop: 4}}
+                    />
+                  </div>
+                )}
+                {emergencyError && <p style={{color: '#b91c1c', marginTop: 8, fontWeight: 500}}>{emergencyError}</p>}
+                <div style={{display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 24}}>
+                  <button
+                    type="button"
+                    onClick={() => { setShowEmergencyModal(false); setEmergencyReason(''); setEmergencyNotes(''); setEmergencyError(''); }}
+                    style={{background: '#f3f4f6', color: '#222', border: 'none', borderRadius: 6, padding: '8px 18px', fontWeight: 600, fontSize: 15, cursor: 'pointer'}}
+                  >Cancel</button>
+                  <button
+                    type="submit"
+                    style={{background: 'linear-gradient(to right, #ef4444, #b91c1c)', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 18px', fontWeight: 700, fontSize: 15, cursor: 'pointer'}}
+                  >Send to Doctor</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </header>
       <div className="w-full bg-gradient-to-br from-gray-50 to-teal-50/30 p-4 md:p-6" style={{paddingTop: '72px'}}>
         <div className="max-w-4xl mx-auto">
