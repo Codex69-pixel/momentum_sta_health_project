@@ -68,44 +68,75 @@ export function NurseTriage({ onNavigate }) {
     'Thyroid Disease', 'Arthritis', 'Kidney Disease'
   ];
 
-  // Calculate MEWS Score
-  const calculateMEWS = useMemo(() => {
-    let score = 0;
 
-    // Respiratory Rate
+  // SATS Clinical Discriminators (examples, can be expanded)
+  const satsDiscriminators = [
+    { value: 'airway', label: 'Threatened airway' },
+    { value: 'breathing', label: 'Severe respiratory distress' },
+    { value: 'circulation', label: 'Shock (SBP < 90 mmHg)' },
+    { value: 'neurology', label: 'Unresponsive (GCS < 9)' },
+    { value: 'seizure', label: 'Active seizure' },
+    { value: 'hypoglycaemia', label: 'Hypoglycaemia (glucose < 3)' },
+    { value: 'major_trauma', label: 'Major trauma' },
+    { value: 'other', label: 'Other (see notes)' },
+  ];
+
+  // SATS Triage Calculation
+  const [selectedDiscriminator, setSelectedDiscriminator] = useState('');
+  const [discriminatorNotes, setDiscriminatorNotes] = useState('');
+
+  // SATS vital sign cutoffs (simplified for demo)
+  function getSATSLevel() {
+    // If a clinical discriminator is selected, RED
+    if (selectedDiscriminator) return { level: 'RED', status: 'Emergency', color: 'from-red-500 to-red-600' };
+
     const rr = parseInt(formData.respiratoryRate);
-    if (rr >= 25) score += 2;
-    else if (rr >= 21) score += 1;
-
-    // Heart Rate
     const hr = parseInt(formData.heartRate);
-    if (hr >= 131) score += 2;
-    else if ((hr >= 111 && hr <= 130) || (hr >= 41 && hr <= 50)) score += 1;
-
-    // Systolic BP
     const sbp = parseInt(formData.bloodPressureSystolic);
-    if (sbp >= 201) score += 2;
-    else if ((sbp >= 181 && sbp <= 200) || (sbp >= 71 && sbp <= 80)) score += 1;
-
-    // SpO2
     const spo2 = parseInt(formData.spo2);
-    if (spo2 <= 91) score += 2;
-    else if (spo2 <= 93) score += 1;
-
-    // Temperature
     const temp = parseFloat(formData.temperature);
-    if (temp >= 39) score += 2;
-    else if ((temp >= 38.5 && temp < 39) || (temp >= 35.1 && temp <= 36)) score += 1;
 
-    return score;
-  }, [formData.respiratoryRate, formData.heartRate, formData.bloodPressureSystolic, 
-      formData.spo2, formData.temperature]);
+    // RED: Any of these vital signs in critical range
+    if (
+      rr > 30 || rr < 10 ||
+      hr > 130 || hr < 40 ||
+      sbp < 90 ||
+      spo2 < 90 ||
+      temp > 40 || temp < 35
+    ) return { level: 'RED', status: 'Emergency', color: 'from-red-500 to-red-600' };
 
-  const triageLevel = useMemo(() => {
-    if (calculateMEWS >= 5) return { level: 'RED', status: 'CRITICAL', color: 'from-red-500 to-red-600' };
-    if (calculateMEWS >= 2) return { level: 'YELLOW', status: 'URGENT', color: 'from-yellow-500 to-yellow-600' };
-    return { level: 'GREEN', status: 'STABLE', color: 'from-green-500 to-green-600' };
-  }, [calculateMEWS]);
+    // ORANGE: Next most urgent
+    if (
+      (rr >= 21 && rr <= 30) ||
+      (hr >= 111 && hr <= 130) ||
+      (sbp >= 90 && sbp <= 100) ||
+      (spo2 >= 90 && spo2 <= 94) ||
+      (temp >= 38.5 && temp <= 40)
+    ) return { level: 'ORANGE', status: 'Very Urgent', color: 'from-orange-500 to-orange-600' };
+
+    // YELLOW: Moderate
+    if (
+      (rr >= 16 && rr <= 20) ||
+      (hr >= 91 && hr <= 110) ||
+      (sbp >= 101 && sbp <= 110) ||
+      (spo2 >= 95 && spo2 <= 96) ||
+      (temp >= 37.5 && temp < 38.5)
+    ) return { level: 'YELLOW', status: 'Urgent', color: 'from-yellow-500 to-yellow-600' };
+
+    // GREEN: Normal
+    if (
+      (rr >= 10 && rr <= 15) &&
+      (hr >= 51 && hr <= 90) &&
+      (sbp > 110) &&
+      (spo2 > 96) &&
+      (temp >= 35 && temp < 37.5)
+    ) return { level: 'GREEN', status: 'Routine', color: 'from-green-500 to-green-600' };
+
+    // BLUE: Dead on arrival (not implemented in UI)
+    return { level: 'BLUE', status: 'Deceased', color: 'from-blue-500 to-blue-600' };
+  }
+
+  const triageLevel = getSATSLevel();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -607,10 +638,33 @@ export function NurseTriage({ onNavigate }) {
                 </div>
               </div>
 
-              {/* MEWS Score Display */}
+              {/* SATS Triage Display */}
               <div className={`bg-gradient-to-r ${triageLevel.color} text-white rounded-2xl p-6 shadow-lg`}>
-                <h3 className="text-lg font-bold mb-2">MEWS Score: {calculateMEWS}</h3>
-                <p className="text-white/90">Triage Level: <span className="font-bold text-lg">{triageLevel.level} - {triageLevel.status}</span></p>
+                <h3 className="text-lg font-bold mb-2">SATS Triage: {triageLevel.level} - {triageLevel.status}</h3>
+                <p className="text-white/90">(Based on SATS vital signs and clinical discriminators)</p>
+              </div>
+
+              {/* SATS Clinical Discriminator Selection */}
+              <div className="mt-6">
+                <label className="input-label font-semibold mb-2">SATS Clinical Discriminator (if present):</label>
+                <select
+                  className="input-field"
+                  value={selectedDiscriminator}
+                  onChange={e => setSelectedDiscriminator(e.target.value)}
+                >
+                  <option value="">None</option>
+                  {satsDiscriminators.map(d => (
+                    <option key={d.value} value={d.value}>{d.label}</option>
+                  ))}
+                </select>
+                {selectedDiscriminator === 'other' && (
+                  <textarea
+                    className="input-field mt-2"
+                    placeholder="Describe other clinical discriminator..."
+                    value={discriminatorNotes}
+                    onChange={e => setDiscriminatorNotes(e.target.value)}
+                  />
+                )}
               </div>
             </div>
           )}
@@ -768,11 +822,71 @@ export function NurseTriage({ onNavigate }) {
                 Review & Triage Assessment
               </h2>
 
-              {/* Triage Badge */}
+              {/* SATS Triage Badge */}
               <div className={`bg-gradient-to-r ${triageLevel.color} text-white rounded-2xl p-6 shadow-lg mb-6`}>
                 <h3 className="text-2xl font-bold mb-2">{triageLevel.level} - {triageLevel.status}</h3>
-                <p className="text-white/90">MEWS Score: {calculateMEWS} points</p>
+                <p className="text-white/90">(SATS Triage Category)</p>
+                {selectedDiscriminator && (
+                  <div className="mt-2 text-white/90">
+                    <span className="font-semibold">Discriminator:</span> {satsDiscriminators.find(d => d.value === selectedDiscriminator)?.label || 'Other'}
+                    {selectedDiscriminator === 'other' && discriminatorNotes && (
+                      <span> - {discriminatorNotes}</span>
+                    )}
+                  </div>
+                )}
               </div>
+          {/* SATS Reference Chart */}
+          <div className="mt-8 mb-4">
+            <h3 className="font-bold text-gray-900 mb-2">SATS Adult Triage Reference (Vital Signs)</h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-xs border border-gray-300 rounded-lg bg-white">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-2 py-1 border">Category</th>
+                    <th className="px-2 py-1 border">Resp. Rate</th>
+                    <th className="px-2 py-1 border">Heart Rate</th>
+                    <th className="px-2 py-1 border">Systolic BP</th>
+                    <th className="px-2 py-1 border">SpO₂</th>
+                    <th className="px-2 py-1 border">Temp (°C)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="bg-red-100">
+                    <td className="px-2 py-1 border font-bold text-red-700">RED</td>
+                    <td className="px-2 py-1 border">&gt;30 or &lt;10</td>
+                    <td className="px-2 py-1 border">&gt;130 or &lt;40</td>
+                    <td className="px-2 py-1 border">&lt;90</td>
+                    <td className="px-2 py-1 border">&lt;90</td>
+                    <td className="px-2 py-1 border">&gt;40 or &lt;35</td>
+                  </tr>
+                  <tr className="bg-orange-100">
+                    <td className="px-2 py-1 border font-bold text-orange-700">ORANGE</td>
+                    <td className="px-2 py-1 border">21-30</td>
+                    <td className="px-2 py-1 border">111-130</td>
+                    <td className="px-2 py-1 border">90-100</td>
+                    <td className="px-2 py-1 border">90-94</td>
+                    <td className="px-2 py-1 border">38.5-40</td>
+                  </tr>
+                  <tr className="bg-yellow-100">
+                    <td className="px-2 py-1 border font-bold text-yellow-700">YELLOW</td>
+                    <td className="px-2 py-1 border">16-20</td>
+                    <td className="px-2 py-1 border">91-110</td>
+                    <td className="px-2 py-1 border">101-110</td>
+                    <td className="px-2 py-1 border">95-96</td>
+                    <td className="px-2 py-1 border">37.5-38.4</td>
+                  </tr>
+                  <tr className="bg-green-100">
+                    <td className="px-2 py-1 border font-bold text-green-700">GREEN</td>
+                    <td className="px-2 py-1 border">10-15</td>
+                    <td className="px-2 py-1 border">51-90</td>
+                    <td className="px-2 py-1 border">&gt;110</td>
+                    <td className="px-2 py-1 border">&gt;96</td>
+                    <td className="px-2 py-1 border">35-37.4</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
 
               {/* Patient Summary */}
               <div className="space-y-4">
