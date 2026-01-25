@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import NotificationButton from './common/NotificationButton';
 import { logout } from '../utils/logout';
 import {
   User, Heart, Activity, Save, FileText, AlertCircle,
@@ -271,6 +272,8 @@ export function NurseTriage({ onNavigate }) {
       }}>
         <h1 style={{fontWeight: 700, fontSize: '1.3rem', letterSpacing: '0.01em', margin: 0}}>Nurses Stra-Health Triage</h1>
         <div style={{position: 'relative', display: 'flex', alignItems: 'center', gap: 12}}>
+          {/* Notification Button */}
+          <NotificationButton onClick={() => alert('Notifications will appear here. (Backend integration pending)')} />
           {/* Emergency Button */}
           <button
             style={{

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import NotificationButton from './common/NotificationButton';
 import QueueManagement from './QueueManagement';
 import { logout } from '../utils/logout';
 import {
@@ -90,11 +91,11 @@ export function DoctorPortal({ onNavigate }) {
 
   // Top bar content (can be customized)
   const TopBar = () => (
-    <div className="doctor-dashboard-topbar">
+    <div className="doctor-dashboard-topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <span style={{ fontWeight: 700, fontSize: '1.3rem', color: '#14b8a6' }}>
         Stra-Health Doctor Portal
       </span>
-      {/* Add more top bar content here if needed */}
+      <NotificationButton onClick={() => alert('Notifications will appear here. (Backend integration pending)')} />
     </div>
   );
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import NotificationButton from './common/NotificationButton';
 import { 
   User, ChevronDown, LogOut, Home, BarChart3, Package, Plus, 
   AlertTriangle, CheckCircle, Clock, TrendingUp, Search, Filter, 
@@ -177,6 +178,10 @@ export function InventoryManagement({ onNavigate }) {
             >
               <BarChart3 className="inline w-5 h-5 mr-1" /> Analytics
             </button>
+            <div className="flex items-center gap-3">
+              <NotificationButton onClick={() => alert('Notifications will appear here. (Backend integration pending)')} />
+              {/* ...existing user menu code... */}
+            </div>
           </nav>
 
           {/* Right: User Icon & Dropdown */}

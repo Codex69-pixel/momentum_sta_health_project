@@ -13,6 +13,7 @@
  */
 
 import React, { useState } from 'react';
+import NotificationButton from './common/NotificationButton';
 import { Activity, Stethoscope, Users, LayoutDashboard, Package, BarChart3, LogOut, Menu, X, Bell } from 'lucide-react';
 
 export function Navigation({ currentScreen, onNavigate, user, onLogout }) {
@@ -107,8 +108,9 @@ export function Navigation({ currentScreen, onNavigate, user, onLogout }) {
             })}
           </div>
 
-          {/* User Info & Actions (Desktop) */}
+          {/* Notification Button & User Info (Desktop) */}
           <div className="hidden lg:flex items-center space-x-4">
+            <NotificationButton onClick={() => alert('Notifications will appear here. (Backend integration pending)')} />
             <div className="flex items-center space-x-3 pl-3 border-l border-teal-300">
               <div className="w-8 h-8 bg-white/20 border border-white/30 rounded-full flex items-center justify-center">
                 <span className="text-white text-sm font-semibold">

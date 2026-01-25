@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import NotificationButton from './common/NotificationButton';
 import { User, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
 import { logout } from '../utils/logout';
 import LoadingSpinner from './common/LoadingSpinner';
@@ -108,7 +109,9 @@ export function ResourceDashboard({ onNavigate }) {
         padding: '0 24px'
       }}>
         <h1 style={{fontWeight: 700, fontSize: '1.3rem', letterSpacing: '0.01em', margin: 0}}>Hospital Resources</h1>
-        <div style={{position: 'relative', display: 'flex', alignItems: 'center'}}>
+        <div style={{position: 'relative', display: 'flex', alignItems: 'center', gap: 12}}>
+          {/* Notification Button */}
+          <NotificationButton onClick={() => alert('Notifications will appear here. (Backend integration pending)')} />
           <button
             style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0, marginLeft: 16}}
             onClick={() => setShowDropdown(prev => !prev)}

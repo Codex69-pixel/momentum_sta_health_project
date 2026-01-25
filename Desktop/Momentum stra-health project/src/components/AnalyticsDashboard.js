@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import NotificationButton from './common/NotificationButton';
 import { BarChart3, Users, Clock, TrendingUp, Download, Calendar } from 'lucide-react';
 import LoadingSpinner from './common/LoadingSpinner';
 import Papa from 'papaparse';
@@ -93,6 +94,7 @@ function AnalyticsDashboard({ onNavigate }) {
             <p className="text-gray-600">Hospital performance metrics and insights</p>
           </div>
           <div className="flex items-center space-x-3">
+            <NotificationButton onClick={() => alert('Notifications will appear here. (Backend integration pending)')} />
             <div className="flex items-center space-x-2 bg-white px-4 py-2 rounded-xl border border-gray-200">
               <Calendar className="w-4 h-4 text-teal-600" />
               <select 
