@@ -52,21 +52,7 @@ export function ResourceDashboard({ onNavigate }) {
       ]
     }
   };
-        {/* Quick navigation dropdown for modules */}
-        {onNavigate && (
-          <select
-            style={{ marginLeft: 24, padding: '6px 12px', borderRadius: 8, border: '1px solid #14b8a6', background: '#fff', color: '#0d9488', fontWeight: 600 }}
-            onChange={e => onNavigate(e.target.value)}
-            defaultValue=""
-          >
-            <option value="" disabled>Go to module...</option>
-            <option value="nurse">Nurse Triage</option>
-            <option value="queue">Queue Management</option>
-            <option value="doctor">Doctor Portal</option>
-            <option value="inventory">Inventory</option>
-            <option value="analytics">Analytics</option>
-          </select>
-        )}
+  // ...existing code...
 
   const scheduleAlerts = [
     { id: 1, type: 'shift', title: 'Evening Shift - 3 Vacancies', dept: 'Emergency', time: 'Today 6 PM', severity: 'high' },
@@ -92,6 +78,23 @@ export function ResourceDashboard({ onNavigate }) {
 
   return (
     <div className="w-full bg-gradient-to-br from-gray-50 to-teal-50/30 min-h-screen">
+      {/* Quick navigation dropdown for modules */}
+      {onNavigate && (
+        <div style={{ padding: '24px 0 0 24px' }}>
+          <select
+            style={{ marginLeft: 0, padding: '6px 12px', borderRadius: 8, border: '1px solid #14b8a6', background: '#fff', color: '#0d9488', fontWeight: 600 }}
+            onChange={e => onNavigate(e.target.value)}
+            defaultValue=""
+          >
+            <option value="" disabled>Go to module...</option>
+            <option value="nurse">Nurse Triage</option>
+            <option value="queue">Queue Management</option>
+            <option value="doctor">Doctor Portal</option>
+            <option value="inventory">Inventory</option>
+            <option value="analytics">Analytics</option>
+          </select>
+        </div>
+      )}
       {/* Top Bar */}
       <header style={{
         position: 'fixed',

@@ -14,7 +14,7 @@ export function NurseTriage({ onNavigate }) {
   const [emergencyReason, setEmergencyReason] = useState('');
   const [emergencyNotes, setEmergencyNotes] = useState('');
   const [emergencyError, setEmergencyError] = useState('');
-        const [showLogout, setShowLogout] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
   const [formData, setFormData] = useState({
     // Step 1: Demographics
     name: '',
