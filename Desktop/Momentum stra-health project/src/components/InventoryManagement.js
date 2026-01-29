@@ -302,20 +302,10 @@ export function InventoryManagement({ onNavigate }) {
 
   const getStatusConfig = (status) => STATUS_CONFIG[status] || STATUS_CONFIG.optimal;
 
-  // TopBar Component
+  // TopBar Component - UPDATED
   const TopBar = () => (
     <header className="inventory-topbar">
       <div className="topbar-content">
-        {/* Mobile Menu Button */}
-        <button 
-          className="mobile-menu-btn"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={mobileMenuOpen}
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-
         {/* Logo/Brand */}
         <div className="brand-section">
           <div className="brand-logo">
@@ -327,7 +317,7 @@ export function InventoryManagement({ onNavigate }) {
           </div>
         </div>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Navigation - Simplified (only module select) */}
         <nav className="desktop-nav">
           {onNavigate && (
             <select
@@ -344,164 +334,90 @@ export function InventoryManagement({ onNavigate }) {
               <option value="analytics">Analytics</option>
             </select>
           )}
-          
-          <button 
-            className="nav-btn"
-            onClick={() => window.location.href = '/pharmacy/home'}
-            aria-label="Go to home"
-          >
-            <Home size={20} />
-            <span>Home</span>
-          </button>
-          
-          <button 
-            className="nav-btn"
-            onClick={() => window.location.href = '/pharmacy/analytics'}
-            aria-label="View analytics"
-          >
-            <BarChart3 size={20} />
-            <span>Analytics</span>
-          </button>
+        </nav>
 
+        {/* Right Side Actions - Notification and User Menu */}
+        <div className="right-actions">
           <NotificationButton 
             onClick={() => alert('Notifications will appear here. (Backend integration pending)')}
             aria-label="View notifications"
+            className="notification-btn-right"
           />
-        </nav>
-
-        {/* User Menu */}
-        <div className="user-menu-container">
-          <button
-            className="user-menu-btn"
-            onClick={() => setShowUserMenu(!showUserMenu)}
-            aria-label="User menu"
-            aria-expanded={showUserMenu}
-          >
-            <div className="user-avatar">
-              <User size={20} />
-            </div>
-            <ChevronDown className={`chevron ${showUserMenu ? 'rotated' : ''}`} size={16} />
-          </button>
-
-          {showUserMenu && (
-            <>
-              <div 
-                className="dropdown-backdrop" 
-                onClick={() => setShowUserMenu(false)}
-                aria-hidden="true"
-              />
-              <div className="user-dropdown">
-                <div className="user-info">
-                  <div className="user-avatar large">
-                    <User size={24} />
-                  </div>
-                  <div>
-                    <p className="user-name">Pharmacy Admin</p>
-                    <p className="user-role">Inventory Manager</p>
-                  </div>
-                </div>
-                
-                <div className="dropdown-divider" />
-                
-                <button
-                  onClick={() => {
-                    setShowPrescriptions(true);
-                    setShowUserMenu(false);
-                  }}
-                  className="dropdown-item"
-                  aria-label="View prescriptions"
-                >
-                  <FileText size={18} />
-                  <span>View Prescriptions</span>
-                </button>
-                
-                <button
-                  onClick={() => {
-                    setShowAddModal(true);
-                    setShowUserMenu(false);
-                  }}
-                  className="dropdown-item"
-                  aria-label="Add medication"
-                >
-                  <Plus size={18} />
-                  <span>Add Medication</span>
-                </button>
-                
-                <div className="dropdown-divider" />
-                
-                <button
-                  onClick={handleLogout}
-                  className="dropdown-item logout"
-                  aria-label="Logout"
-                >
-                  <LogOut size={18} />
-                  <span>Logout</span>
-                </button>
+          
+          {/* User Menu */}
+          <div className="user-menu-container">
+            <button
+              className="user-menu-btn"
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              aria-label="User menu"
+              aria-expanded={showUserMenu}
+            >
+              <div className="user-avatar">
+                <User size={20} />
               </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Mobile Navigation */}
-      {mobileMenuOpen && (
-        <div className="mobile-nav">
-          <div className="mobile-nav-content">
-            <button 
-              className="mobile-nav-item"
-              onClick={() => {
-                window.location.href = '/pharmacy/home';
-                setMobileMenuOpen(false);
-              }}
-            >
-              <Home size={20} />
-              <span>Home</span>
-            </button>
-            
-            <button 
-              className="mobile-nav-item"
-              onClick={() => {
-                setShowPrescriptions(true);
-                setMobileMenuOpen(false);
-              }}
-            >
-              <FileText size={20} />
-              <span>Prescriptions</span>
-            </button>
-            
-            <button 
-              className="mobile-nav-item"
-              onClick={() => {
-                window.location.href = '/pharmacy/analytics';
-                setMobileMenuOpen(false);
-              }}
-            >
-              <BarChart3 size={20} />
-              <span>Analytics</span>
+              <ChevronDown className={`chevron ${showUserMenu ? 'rotated' : ''}`} size={16} />
             </button>
 
-            <div className="mobile-module-select">
-              {onNavigate && (
-                <select
-                  className="module-select"
-                  onChange={e => {
-                    onNavigate(e.target.value);
-                    setMobileMenuOpen(false);
-                  }}
-                  defaultValue=""
-                >
-                  <option value="" disabled>Other Modules</option>
-                  <option value="nurse">Nurse Triage</option>
-                  <option value="queue">Queue Management</option>
-                  <option value="doctor">Doctor Portal</option>
-                  <option value="resources">Resource Dashboard</option>
-                  <option value="analytics">Analytics</option>
-                </select>
-              )}
-            </div>
+            {showUserMenu && (
+              <>
+                <div 
+                  className="dropdown-backdrop" 
+                  onClick={() => setShowUserMenu(false)}
+                  aria-hidden="true"
+                />
+                <div className="user-dropdown">
+                  <div className="user-info">
+                    <div className="user-avatar large">
+                      <User size={24} />
+                    </div>
+                    <div>
+                      <p className="user-name">Pharmacy Admin</p>
+                      <p className="user-role">Inventory Manager</p>
+                    </div>
+                  </div>
+                  
+                  <div className="dropdown-divider" />
+                  
+                  <button
+                    onClick={() => {
+                      setShowPrescriptions(true);
+                      setShowUserMenu(false);
+                    }}
+                    className="dropdown-item"
+                    aria-label="View prescriptions"
+                  >
+                    <FileText size={18} />
+                    <span>View Prescriptions</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      setShowAddModal(true);
+                      setShowUserMenu(false);
+                    }}
+                    className="dropdown-item"
+                    aria-label="Add medication"
+                  >
+                    <Plus size={18} />
+                    <span>Add Medication</span>
+                  </button>
+                  
+                  <div className="dropdown-divider" />
+                  
+                  <button
+                    onClick={handleLogout}
+                    className="dropdown-item logout"
+                    aria-label="Logout"
+                  >
+                    <LogOut size={18} />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 
