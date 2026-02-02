@@ -83,20 +83,28 @@ export const apiService = {
    * @param {object} credentials - { username, password, role }
    * @returns {Promise<{user, token}>}
    */
-  async login(credentials) {
+  /**
+   * User login (POST /api/v1/auth/login)
+   * @param {object} credentials - { email, password }
+   * @returns {Promise<{success, token, refreshToken, user}>}
+   */
+  async login({ email, password }) {
     const data = await apiRequest('/api/v1/auth/login', {
       method: 'POST',
-      body: JSON.stringify(credentials)
+      body: JSON.stringify({ email, password })
     });
-    if (data.token) {
-      setAuthToken(data.token);
-    }
+    if (data.token) setAuthToken(data.token);
     return data;
   },
 
   /**
    * User registration
    * @param {object} userData - Registration form data
+   * @returns {Promise<object>}
+   */
+  /**
+   * User registration (POST /api/v1/auth/register)
+   * @param {object} userData - { email, password, firstName, lastName, role, ... }
    * @returns {Promise<object>}
    */
   async register(userData) {
@@ -109,9 +117,13 @@ export const apiService = {
    * User logout
    * @returns {Promise<{success}>}
    */
+  /**
+   * User logout (POST /api/v1/auth/logout)
+   * @returns {Promise<{success}>}
+   */
   async logout() {
-    const result = await apiRequest('/auth/logout', { method: 'POST' });
-    localStorage.removeItem('authToken');
+    const result = await apiRequest('/api/v1/auth/logout', { method: 'POST' });
+    clearAuthToken();
     return result;
   },
 
@@ -119,9 +131,7 @@ export const apiService = {
    * Verify authentication token
    * @returns {Promise<{valid, user}>}
    */
-  async verifyToken() {
-    return apiRequest('/auth/verify', { method: 'GET' });
-  },
+  // No /auth/verify endpoint in swagger.json, consider removing or updating if backend adds it
 
   // ==================== PATIENT MANAGEMENT ====================
   
@@ -130,9 +140,26 @@ export const apiService = {
    * @param {object} filters - Optional filters { department, urgency, status }
    * @returns {Promise<Array>}
    */
-  async getPatients(filters = {}) {
-    const queryParams = new URLSearchParams(filters).toString();
-    return apiRequest(`/patients?${queryParams}`, { method: 'GET' });
+  // TODO: Update patient endpoints to use /api/v1/triage/patients and /api/v1/doctor/patients as per swagger.json
+  /**
+   * Register new patient (POST /api/v1/triage/patients)
+   * @param {object} patientData
+   * @returns {Promise<object>}
+   */
+  async registerPatient(patientData) {
+    return apiRequest('/api/v1/triage/patients', {
+      method: 'POST',
+      body: JSON.stringify(patientData)
+    });
+  },
+
+  /**
+   * Get patient details (GET /api/v1/triage/patients/{patientId})
+   * @param {string} patientId
+   * @returns {Promise<object>}
+   */
+  async getPatientById(patientId) {
+    return apiRequest(`/api/v1/triage/patients/${patientId}`, { method: 'GET' });
   },
 
   /**
@@ -140,20 +167,19 @@ export const apiService = {
    * @param {string} patientId - STRA patient ID
    * @returns {Promise<object>}
    */
-  async getPatientById(patientId) {
-    return apiRequest(`/patients/${patientId}`, { method: 'GET' });
-  },
 
   /**
    * Register new patient (Nurse Triage)
    * @param {object} patientData - Complete patient registration form data
    * @returns {Promise<{patientId, straId}>}
    */
-  async registerPatient(patientData) {
-    return apiRequest('/patients', {
-      method: 'POST',
-      body: JSON.stringify(patientData)
-    });
+  /**
+   * Get patient triage history (GET /api/v1/triage/patient/{patientId}/history)
+   * @param {string} patientId
+   * @returns {Promise<Array>}
+   */
+  async getPatientHistory(patientId) {
+    return apiRequest(`/api/v1/triage/patient/${patientId}/history`, { method: 'GET' });
   },
 
   /**
@@ -184,8 +210,13 @@ export const apiService = {
    * Get queue for all departments
    * @returns {Promise<Array>}
    */
-  async getQueues() {
-    return apiRequest('/queues', { method: 'GET' });
+  /**
+   * Get department queue (GET /api/v1/triage/queue/{departmentId})
+   * @param {string} departmentId
+   * @returns {Promise<Array>}
+   */
+  async getDepartmentQueue(departmentId) {
+    return apiRequest(`/api/v1/triage/queue/${departmentId}`, { method: 'GET' });
   },
 
   /**
@@ -203,10 +234,16 @@ export const apiService = {
    * @param {string} status - New status (WAITING, IN_PROGRESS, COMPLETED)
    * @returns {Promise<object>}
    */
-  async updateQueueStatus(patientId, status) {
-    return apiRequest(`/queues/${patientId}/status`, {
+  /**
+   * Update queue position (PATCH /api/v1/triage/queue/{queueId}/position)
+   * @param {string} queueId
+   * @param {number} position
+   * @returns {Promise<object>}
+   */
+  async updateQueuePosition(queueId, position) {
+    return apiRequest(`/api/v1/triage/queue/${queueId}/position`, {
       method: 'PATCH',
-      body: JSON.stringify({ status })
+      body: JSON.stringify({ position })
     });
   },
 
@@ -231,12 +268,7 @@ export const apiService = {
    * @param {string} notes - Clinical observations
    * @returns {Promise<object>}
    */
-  async addClinicalNotes(patientId, notes) {
-    return apiRequest(`/patients/${patientId}/notes`, {
-      method: 'POST',
-      body: JSON.stringify({ notes })
-    });
-  },
+  // TODO: Add doctor endpoints as per swagger.json (e.g., /api/v1/doctor/patients/{patientId}, /api/v1/doctor/prescriptions, etc.)
 
   /**
    * Create medical orders (lab tests, imaging)
