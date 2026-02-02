@@ -7,6 +7,8 @@ import { DoctorPortal } from './components/DoctorPortal';
 import { InventoryManagement } from './components/InventoryManagement';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
 import ErrorBoundary from './components/common/ErrorBoundary';
+// Set to true to bypass authentication during development
+const DEV_MODE = true;
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState('login');
@@ -32,7 +34,7 @@ export default function App() {
   };
 
   if (currentScreen === 'login' || !user) {
-    return <LoginScreen onLogin={handleLogin} />;
+    return <LoginScreen onLogin={handleLogin} devMode={DEV_MODE} />;
   }
 
   return (

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Lock, User as UserIcon, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import './LoginScreen.css';
+import { apiService } from '../services/api';
 
-export function LoginScreen({ onLogin }) {
+export function LoginScreen({ onLogin, devMode }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [selectedRole, setSelectedRole] = useState('doctor');
@@ -12,13 +13,27 @@ export function LoginScreen({ onLogin }) {
   // Prevent page from being covered by TopBar/Sidebar by using absolute/fixed positioning only for those, not here
   // Remove any 100vh/viewport height that causes zooming or overflow
 
-  const handleSubmit = (e) => {
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onLogin({
-      id: `user-${Date.now()}`,
-      name: username || 'Demo User',
-      role: selectedRole
-    });
+    setError(null);
+    setLoading(true);
+    try {
+      // Use email and password for real login
+      const data = await apiService.login({ email: username, password });
+      onLogin(data.user || { name: username, role: selectedRole });
+    } catch (err) {
+      setError(err.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Dev mode: bypass login
+  const handleDevLogin = () => {
+    onLogin({ id: 'dev-user', name: username || 'Dev User', role: selectedRole });
   };
 
   const roleLabels = {
@@ -129,13 +144,30 @@ export function LoginScreen({ onLogin }) {
               </button>
             </div>
 
+
+            {/* Error Message */}
+            {error && <div className="login-error">{error}</div>}
+
             {/* Login Button */}
             <button
               type="submit"
               className="login-button"
+              disabled={loading}
             >
-              Login
+              {loading ? 'Logging in...' : 'Login'}
             </button>
+
+            {/* Dev Mode Bypass */}
+            {devMode && (
+              <button
+                type="button"
+                className="login-button dev-login"
+                style={{ marginTop: 8, background: '#888' }}
+                onClick={handleDevLogin}
+              >
+                Dev Login (Bypass Auth)
+              </button>
+            )}
 
             {/* Alternative Login Options */}
             <div className="alternative-login">

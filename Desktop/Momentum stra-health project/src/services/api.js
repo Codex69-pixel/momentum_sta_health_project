@@ -84,12 +84,27 @@ export const apiService = {
    * @returns {Promise<{user, token}>}
    */
   async login(credentials) {
-    return apiRequest('/auth/login', {
+    const data = await apiRequest('/api/v1/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials)
     });
+    if (data.token) {
+      setAuthToken(data.token);
+    }
+    return data;
   },
 
+  /**
+   * User registration
+   * @param {object} userData - Registration form data
+   * @returns {Promise<object>}
+   */
+  async register(userData) {
+    return apiRequest('/api/v1/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    });
+  },
   /**
    * User logout
    * @returns {Promise<{success}>}
