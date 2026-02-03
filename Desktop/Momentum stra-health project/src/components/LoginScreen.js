@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, User as UserIcon, Eye, EyeOff, ChevronDown } from 'lucide-react';
+import { User as UserIcon, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import './LoginScreen.css';
 import { apiService } from '../services/api';
 

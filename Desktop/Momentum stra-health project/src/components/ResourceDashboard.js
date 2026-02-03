@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NotificationButton from './common/NotificationButton';
 import { User, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
 import { logout } from '../utils/logout';
+import { apiService } from '../services/api';
 import LoadingSpinner from './common/LoadingSpinner';
 
 export function ResourceDashboard({ onNavigate }) {
@@ -9,72 +10,33 @@ export function ResourceDashboard({ onNavigate }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const resources = {
-    beds: {
-      total: 120,
-      occupied: 87,
-      available: 33,
-      trend: '+5%',
-      units: [
-        { name: 'ICU', total: 12, occupied: 11, status: 'critical' },
-        { name: 'General Ward', total: 60, occupied: 42, status: 'optimal' },
-        { name: 'Maternity', total: 20, occupied: 15, status: 'optimal' },
-        { name: 'Pediatrics', total: 15, occupied: 10, status: 'optimal' },
-        { name: 'Surgery', total: 13, occupied: 9, status: 'optimal' }
-      ]
-    },
-    staff: {
-      total: 156,
-      available: 142,
-      onLeave: 8,
-      sick: 6,
-      trend: '-2%',
-      byRole: [
-        { role: 'Doctors', total: 34, available: 31, onDuty: 12 },
-        { role: 'Nurses', total: 78, available: 72, onDuty: 58 },
-        { role: 'Technicians', total: 28, available: 27, onDuty: 10 },
-        { role: 'Support Staff', total: 16, available: 12, onDuty: 8 }
-      ]
-    },
-    equipment: {
-      total: 245,
-      operational: 238,
-      maintenance: 5,
-      broken: 2,
-      trend: '+1%',
-      byType: [
-        { name: 'Ventilators', total: 15, operational: 14, maintenance: 1 },
-        { name: 'ECG Machines', total: 18, operational: 18, maintenance: 0 },
-        { name: 'IV Pumps', total: 45, operational: 43, maintenance: 2 },
-        { name: 'Monitors', total: 92, operational: 90, maintenance: 2 },
-        { name: 'Wheelchairs', total: 35, operational: 34, maintenance: 1 },
-        { name: 'Oxygen Tanks', total: 40, operational: 39, maintenance: 1 }
-      ]
+  const [resources, setResources] = useState({ beds: { units: [] }, staff: { byRole: [] }, equipment: { byType: [] } });
+  const [departments, setDepartments] = useState([]);
+  const [schedules, setSchedules] = useState([]);
+  const [scheduleAlerts, setScheduleAlerts] = useState([]);
+
+
+  useEffect(() => {
+    async function fetchResourceDashboard() {
+      setLoading(true);
+
+      try {
+        const data = await apiService.getResourceDashboard();
+        setResources(data.resources || { beds: { units: [] }, staff: { byRole: [] }, equipment: { byType: [] } });
+        setDepartments(data.departments || []);
+        setSchedules(data.schedules || []);
+        setScheduleAlerts(data.scheduleAlerts || []);
+      } catch (err) {
+
+      } finally {
+        setLoading(false);
+      }
     }
-  };
+    fetchResourceDashboard();
+  }, []);
   // ...existing code...
 
-  const scheduleAlerts = [
-    { id: 1, type: 'shift', title: 'Evening Shift - 3 Vacancies', dept: 'Emergency', time: 'Today 6 PM', severity: 'high' },
-    { id: 2, type: 'equipment', title: 'Ventilator #5 Maintenance Due', dept: 'ICU', time: 'Tomorrow', severity: 'medium' },
-    { id: 3, type: 'staff', title: 'Dr. Kariuki - Sick Leave', dept: 'Cardiology', time: 'Today', severity: 'low' },
-    { id: 4, type: 'bed', title: 'ICU Bed Occupancy at 92%', dept: 'ICU', time: 'Current', severity: 'high' }
-  ];
 
-  const schedules = [
-    { date: '2024-01-15', shift: 'Morning', staff: 45, dept: 'All', occupancy: '72%' },
-    { date: '2024-01-15', shift: 'Afternoon', staff: 42, dept: 'All', occupancy: '78%' },
-    { date: '2024-01-15', shift: 'Night', staff: 38, dept: 'All', occupancy: '68%' },
-    { date: '2024-01-16', shift: 'Morning', staff: 45, dept: 'All', occupancy: '70%' },
-  ];
-
-  const departments = [
-    { name: 'Emergency', occupancy: 85, staff: 28, critical: 3 },
-    { name: 'ICU', occupancy: 92, staff: 18, critical: 8 },
-    { name: 'General Ward', occupancy: 70, staff: 35, critical: 0 },
-    { name: 'Cardiology', occupancy: 75, staff: 12, critical: 2 },
-    { name: 'Pediatrics', occupancy: 67, staff: 15, critical: 0 }
-  ];
 
   return (
     <div className="w-full bg-gradient-to-br from-gray-50 to-teal-50/30 min-h-screen">

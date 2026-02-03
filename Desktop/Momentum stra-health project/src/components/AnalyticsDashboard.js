@@ -1,71 +1,59 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NotificationButton from './common/NotificationButton';
 import { BarChart3, Users, Clock, TrendingUp, Download, Calendar } from 'lucide-react';
 import LoadingSpinner from './common/LoadingSpinner';
-import Papa from 'papaparse';
+// import Papa from 'papaparse';
+import { apiService } from '../services/api';
 
-const mockAnalytics = {
-  patientVolume: {
-    daily: 147,
-    weekly: 892,
-    monthly: 3654,
-    trend: '+12%'
-  },
-  avgWaitTimes: {
-    red: 8,
-    yellow: 24,
-    green: 58,
-    overall: 35
-  },
-  departmentStats: [
-    { dept: 'Emergency', patients: 1245, avgWait: 18, satisfaction: 87, trend: '+5%' },
-    { dept: 'General Medicine', patients: 892, avgWait: 42, satisfaction: 82, trend: '+2%' },
-    { dept: 'Pediatrics', patients: 654, avgWait: 35, satisfaction: 90, trend: '+8%' },
-    { dept: 'Surgery', patients: 432, avgWait: 28, satisfaction: 85, trend: '+3%' },
-    { dept: 'ICU', patients: 231, avgWait: 12, satisfaction: 88, trend: '+1%' }
-  ],
-  resourceUtilization: {
-    beds: 68,
-    staff: 82,
-    equipment: 74
-  },
-  monthlyTrend: [
-    { month: 'Jan', patients: 2800, completed: 2100, pending: 700 },
-    { month: 'Feb', patients: 3200, completed: 2500, pending: 700 },
-    { month: 'Mar', patients: 3654, completed: 2900, pending: 754 }
-  ]
-};
+
+
+
 
 function AnalyticsDashboard({ onNavigate }) {
+    // CSV export handler (dummy, since Papa is not used)
+    const handleExportCSV = () => {
+      // Placeholder: implement CSV export if needed
+      alert('CSV export not implemented.');
+    };
   const [timeframe, setTimeframe] = useState('monthly');
   const [loading, setLoading] = useState(false);
+  const [analytics, setAnalytics] = useState({
+    patientVolume: {},
+    avgWaitTimes: {},
+    departmentStats: [],
+    resourceUtilization: {},
+    monthlyTrend: []
+  });
 
-  // Example: Simulate loading on fetch
-  const handleFetch = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      // ...fetch logic...
-    }, 1200);
-  };
+  // Wait time cards array
+  const waitTimeCards = [
+    { label: 'Critical (RED)', value: analytics.avgWaitTimes?.red, unit: 'min', color: 'text-red-600', bg: 'bg-red-50', bar: 'bg-red-500' },
+    { label: 'Urgent (YELLOW)', value: analytics.avgWaitTimes?.yellow, unit: 'min', color: 'text-yellow-600', bg: 'bg-yellow-50', bar: 'bg-yellow-500' },
+    { label: 'Non-Urgent (GREEN)', value: analytics.avgWaitTimes?.green, unit: 'min', color: 'text-green-600', bg: 'bg-green-50', bar: 'bg-green-500' },
+    { label: 'Overall Average', value: analytics.avgWaitTimes?.overall, unit: 'min', color: 'text-teal-600', bg: 'bg-teal-50', bar: 'bg-teal-500' }
+  ];
+  // Resource utilization cards array
+  const resourceUtilizationCards = [
+    { label: 'Bed Occupancy', value: analytics.resourceUtilization?.beds, icon: '🛏️', color: 'from-teal-500 to-teal-600' },
+    { label: 'Staff Utilization', value: analytics.resourceUtilization?.staff, icon: '👥', color: 'from-purple-500 to-purple-600' },
+    { label: 'Equipment Usage', value: analytics.resourceUtilization?.equipment, icon: '⚙️', color: 'from-green-500 to-green-600' }
+  ];
 
-  const handleExportCSV = () => {
-    const csv = Papa.unparse(mockAnalytics.monthlyTrend.map(row => ({
-      Metric: row.month,
-      Value: row.patients,
-      Date: new Date().toLocaleDateString()
-    })));
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'analytics.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
+  useEffect(() => {
+    async function fetchAnalytics() {
+      setLoading(true);
+      try {
+        const data = await apiService.getAnalytics();
+        setAnalytics(data || {});
+      } catch (err) {
+        // Optionally handle error
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAnalytics();
+  }, []);
   return (
     <div className="w-full bg-gradient-to-br from-gray-50 to-teal-50/30 p-4 md:p-6">
       <div className="max-w-7xl mx-auto h-full">
@@ -122,10 +110,10 @@ function AnalyticsDashboard({ onNavigate }) {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[
-              { label: 'Today', value: mockAnalytics.patientVolume.daily, icon: '📊' },
-              { label: 'This Week', value: mockAnalytics.patientVolume.weekly, icon: '📈' },
-              { label: 'This Month', value: mockAnalytics.patientVolume.monthly, icon: '📉' },
-              { label: 'Growth', value: mockAnalytics.patientVolume.trend, icon: '⬆️' }
+              { label: 'Today', value: analytics.patientVolume?.daily, icon: '📊' },
+              { label: 'This Week', value: analytics.patientVolume?.weekly, icon: '📈' },
+              { label: 'This Month', value: analytics.patientVolume?.monthly, icon: '📉' },
+              { label: 'Growth', value: analytics.patientVolume?.trend, icon: '⬆️' }
             ].map((stat, idx) => (
               <div key={idx} className="stat-card animate-fadeIn" style={{animationDelay: `${idx * 50}ms`}}>
                 <p className="text-sm text-gray-600 font-medium mb-2">{stat.label}</p>
@@ -144,12 +132,7 @@ function AnalyticsDashboard({ onNavigate }) {
           </h2>
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {[
-                { label: 'Critical (RED)', value: mockAnalytics.avgWaitTimes.red, unit: 'min', color: 'text-red-600', bg: 'bg-red-50', bar: 'bg-red-500' },
-                { label: 'Urgent (YELLOW)', value: mockAnalytics.avgWaitTimes.yellow, unit: 'min', color: 'text-yellow-600', bg: 'bg-yellow-50', bar: 'bg-yellow-500' },
-                { label: 'Non-Urgent (GREEN)', value: mockAnalytics.avgWaitTimes.green, unit: 'min', color: 'text-green-600', bg: 'bg-green-50', bar: 'bg-green-500' },
-                { label: 'Overall Average', value: mockAnalytics.avgWaitTimes.overall, unit: 'min', color: 'text-teal-600', bg: 'bg-teal-50', bar: 'bg-teal-500' }
-              ].map((item, idx) => (
+              {waitTimeCards.map((item, idx) => (
                 <div key={idx} className={`p-4 rounded-xl ${item.bg} border border-gray-200`}>
                   <p className="text-xs text-gray-600 font-medium mb-2">{item.label}</p>
                   <p className={`text-3xl font-bold ${item.color} mb-2`}>{item.value}</p>
@@ -185,7 +168,7 @@ function AnalyticsDashboard({ onNavigate }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {mockAnalytics.departmentStats.map((dept, idx) => (
+                  {(analytics.departmentStats || []).map((dept, idx) => (
                     <tr 
                       key={idx} 
                       className="hover:bg-teal-50 transition-colors cursor-pointer"
@@ -215,11 +198,11 @@ function AnalyticsDashboard({ onNavigate }) {
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-semibold ${
-                          dept.trend.startsWith('+') 
+                          dept.trend && dept.trend.startsWith('+') 
                             ? 'bg-green-100 text-green-700' 
                             : 'bg-red-100 text-red-700'
                         }`}>
-                          {dept.trend.startsWith('+') ? <TrendingUp className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
+                          {dept.trend && dept.trend.startsWith('+') ? <TrendingUp className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
                           <span>{dept.trend}</span>
                         </span>
                       </td>
@@ -235,11 +218,7 @@ function AnalyticsDashboard({ onNavigate }) {
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Resource Utilization</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { label: 'Bed Occupancy', value: mockAnalytics.resourceUtilization.beds, icon: '🛏️', color: 'from-teal-500 to-teal-600' },
-              { label: 'Staff Utilization', value: mockAnalytics.resourceUtilization.staff, icon: '👥', color: 'from-purple-500 to-purple-600' },
-              { label: 'Equipment Usage', value: mockAnalytics.resourceUtilization.equipment, icon: '⚙️', color: 'from-green-500 to-green-600' }
-            ].map((resource, idx) => (
+              {resourceUtilizationCards.map((resource, idx) => (
               <div key={idx} className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 animate-fadeIn" style={{animationDelay: `${idx * 50}ms`}}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">{resource.label}</h3>
@@ -273,7 +252,7 @@ function AnalyticsDashboard({ onNavigate }) {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Monthly Trend</h2>
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {mockAnalytics.monthlyTrend.map((month, idx) => (
+              {(analytics.monthlyTrend || []).map((month, idx) => (
                 <div key={idx} className="text-center">
                   <p className="text-sm font-semibold text-gray-600 mb-4">{month.month}</p>
                   <div className="flex items-end justify-center space-x-2 h-40 mb-4">

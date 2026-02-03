@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
+import { apiService } from '../services/api';
 import NotificationButton from './common/NotificationButton';
 import { logout } from '../utils/logout';
 import {
@@ -27,6 +28,7 @@ export function NurseTriage({ onNavigate }) {
     emergencyContactPhone: '',
     address: '',
     city: '',
+    subCounty: '',
 
     // Step 2: Vital Signs
     temperature: '',
@@ -205,25 +207,70 @@ export function NurseTriage({ onNavigate }) {
   };
 
   // Example: Simulate loading on submit
-  const handleSubmit = (e) => {
+  const [submitError, setSubmitError] = useState(null);
+  const [submitSuccess, setSubmitSuccess] = useState(null);
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError(null);
+    setSubmitSuccess(null);
+    if (!validateStep()) return;
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      if (validateStep()) {
-        console.log('Submitting form:', formData);
-        alert('Patient registered successfully!\nPatient ID: STRA-' + String(Math.floor(Math.random() * 10000)).padStart(4, '0'));
-        setStep(1);
-        setFormData({
-          name: '', dob: '', gender: '', homePhone: '', mobilePhone: '', email: '',
-          emergencyContactName: '', emergencyContactPhone: '', address: '', city: '',
-          temperature: '', heartRate: '', bloodPressureSystolic: '', bloodPressureDiastolic: '',
-          respiratoryRate: '', spo2: '', height: '', weight: '',
-          chiefComplaint: '', symptoms: [], symptomDuration: '', severity: '',
-          allergies: '', medications: '', pastConditions: [], surgicalHistory: '', familyHistory: '', triageNotes: ''
-        });
+    try {
+      // Map formData to backend schema for registration
+      const payload = {
+        firstName: formData.name.split(' ')[0] || formData.name,
+        lastName: formData.name.split(' ').slice(1).join(' ') || '',
+        dateOfBirth: formData.dob,
+        gender: formData.gender ? formData.gender.charAt(0).toUpperCase() + formData.gender.slice(1).toLowerCase() : '',
+        phoneNumber: formData.mobilePhone,
+        emergencyContact: formData.emergencyContactPhone,
+        emergencyContactName: formData.emergencyContactName,
+        nationalId: '',
+        nhifNumber: '',
+        address: formData.address,
+        county: formData.city,
+        subCounty: formData.subCounty,
+        bloodGroup: '',
+        allergies: formData.allergies ? formData.allergies.split(',').map(a => a.trim()) : [],
+        chronicConditions: formData.pastConditions,
+      };
+      const response = await apiService.registerPatient(payload);
+      // Now perform triage for the registered patient
+      if (response && response.id) {
+        const triagePayload = {
+          patientId: response.id,
+          nurseId: '', // Set nurseId if available from user context
+          vitals: {
+            temperature: parseFloat(formData.temperature),
+            systolicBp: parseInt(formData.bloodPressureSystolic),
+            diastolicBp: parseInt(formData.bloodPressureDiastolic),
+            heartRate: parseInt(formData.heartRate),
+            respiratoryRate: parseInt(formData.respiratoryRate),
+            oxygenSaturation: parseInt(formData.spo2),
+            weight: formData.weight ? parseFloat(formData.weight) : undefined,
+            height: formData.height ? parseFloat(formData.height) : undefined,
+            // Add other vitals if needed
+          },
+          symptoms: {}, // Map symptoms to backend schema if needed
+          chiefComplaint: formData.chiefComplaint,
+        };
+        await apiService.performTriage(triagePayload);
       }
-    }, 1200);
+      setSubmitSuccess('Patient registered and triage completed successfully!');
+      setStep(1);
+      setFormData({
+        name: '', dob: '', gender: '', homePhone: '', mobilePhone: '', email: '',
+        emergencyContactName: '', emergencyContactPhone: '', address: '', city: '', subCounty: '',
+        temperature: '', heartRate: '', bloodPressureSystolic: '', bloodPressureDiastolic: '',
+        respiratoryRate: '', spo2: '', height: '', weight: '',
+        chiefComplaint: '', symptoms: [], symptomDuration: '', severity: '',
+        allergies: '', medications: '', pastConditions: [], surgicalHistory: '', familyHistory: '', triageNotes: ''
+      });
+    } catch (err) {
+      setSubmitError(err.message || 'Registration/triage failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Emergency submit handler
@@ -254,6 +301,12 @@ export function NurseTriage({ onNavigate }) {
 
   return (
     <>
+      {submitError && (
+        <div style={{ background: '#fee2e2', color: '#b91c1c', padding: 12, borderRadius: 8, margin: 12, textAlign: 'center' }}>{submitError}</div>
+      )}
+      {submitSuccess && (
+        <div style={{ background: '#d1fae5', color: '#065f46', padding: 12, borderRadius: 8, margin: 12, textAlign: 'center' }}>{submitSuccess}</div>
+      )}
       {/* Fixed TopBar for Nurse Triage */}
       <header style={{
         position: 'fixed',
@@ -497,9 +550,9 @@ export function NurseTriage({ onNavigate }) {
                     className="input-field"
                   >
                     <option value="">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
                   </select>
                   {errors.gender && <p className="text-red-600 text-sm mt-1">{errors.gender}</p>}
                 </div>
@@ -537,6 +590,18 @@ export function NurseTriage({ onNavigate }) {
                     value={formData.email}
                     onChange={handleInputChange}
                     placeholder="patient@email.com"
+                    className="input-field"
+                  />
+                </div>
+
+                <div className="input-group">
+                  <label className="input-label">Sub-County</label>
+                  <input
+                    type="text"
+                    name="subCounty"
+                    value={formData.subCounty}
+                    onChange={handleInputChange}
+                    placeholder="Sub-county (optional)"
                     className="input-field"
                   />
                 </div>

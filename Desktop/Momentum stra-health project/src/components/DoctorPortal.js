@@ -1,104 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NotificationButton from './common/NotificationButton';
-import QueueManagement from './QueueManagement';
 import { logout } from '../utils/logout';
 import {
-  FileText, Pill, TestTube, CheckCircle, Clock, User, Users,
-  Heart, Activity, AlertCircle, Calendar, Phone, Mail,
-  Thermometer, Droplet, Wind, Plus, X, Save,
-  Printer, Send, Eye, ChevronRight, ChevronDown,
-  Home, BarChart3, Package, LogOut, Search,
-  Settings, Clipboard, Stethoscope, Bell, Menu, X as XIcon
+  FileText, User, Users, Activity, AlertCircle, ChevronRight, ChevronDown, Home, Clipboard, Stethoscope, LogOut, X, Save
 } from 'lucide-react';
 import './DoctorPortal.css';
 import LoadingSpinner from './common/LoadingSpinner';
 import Prescriptions from './prescription';
+import { apiService } from '../services/api';
 
-// Define patient type for better type safety
-const PatientStatus = {
-  RED: 'RED',
-  YELLOW: 'YELLOW',
-  GREEN: 'GREEN'
-};
 
-const mockPatients = [
-  {
-    id: 'STRA-001',
-    name: 'John Doe',
-    age: 45,
-    gender: 'Male',
-    urgency: 'RED',
-    waitTime: 5,
-    symptoms: ['Chest Pain', 'Shortness of Breath', 'Dizziness'],
-    history: 'Hypertension, Type 2 Diabetes',
-    bloodType: 'O+',
-    phone: '+254 712 345 678',
-    email: 'john.doe@email.com',
-    admissionDate: '2026-01-17',
-    vitals: {
-      temperature: '38.5°C',
-      heartRate: '95 bpm',
-      bloodPressure: '145/95',
-      spo2: '97%',
-      respiratoryRate: '20/min'
-    },
-    allergies: ['Penicillin', 'Aspirin'],
-    currentMedications: ['Metformin 500mg', 'Lisinopril 10mg']
-  },
-  {
-    id: 'STRA-002',
-    name: 'Jane Smith',
-    age: 32,
-    gender: 'Female',
-    urgency: 'YELLOW',
-    waitTime: 15,
-    symptoms: ['Headache', 'Fever', 'Fatigue'],
-    history: 'Asthma',
-    bloodType: 'A+',
-    phone: '+254 723 456 789',
-    email: 'jane.smith@email.com',
-    admissionDate: '2026-01-17',
-    vitals: {
-      temperature: '37.8°C',
-      heartRate: '82 bpm',
-      bloodPressure: '120/80',
-      spo2: '98%',
-      respiratoryRate: '16/min'
-    },
-    allergies: ['None'],
-    currentMedications: ['Ventolin Inhaler']
-  },
-  {
-    id: 'STRA-003',
-    name: 'Michael Johnson',
-    age: 28,
-    gender: 'Male',
-    urgency: 'GREEN',
-    waitTime: 30,
-    symptoms: ['Minor Cut', 'Bruising'],
-    history: 'None',
-    bloodType: 'B+',
-    phone: '+254 734 567 890',
-    email: 'michael.j@email.com',
-    admissionDate: '2026-01-17',
-    vitals: {
-      temperature: '36.6°C',
-      heartRate: '72 bpm',
-      bloodPressure: '118/75',
-      spo2: '99%',
-      respiratoryRate: '14/min'
-    },
-    allergies: ['None'],
-    currentMedications: []
-  }
-];
+
+
 
 export function DoctorPortal({ onNavigate }) {
-  const [selectedPatient, setSelectedPatient] = useState(mockPatients[0]);
+  const [patients, setPatients] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
   const [clinicalNotes, setClinicalNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPrescriptions, setShowPrescriptions] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Fetch doctor queue on mount
+  useEffect(() => {
+    async function fetchQueue() {
+      setLoading(true);
+      setError(null);
+      try {
+        const queue = await apiService.getDoctorQueue();
+        setPatients(queue || []);
+        setSelectedPatient(queue && queue.length > 0 ? queue[0] : null);
+      } catch (err) {
+        setError('Failed to load doctor queue');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchQueue();
+  }, []);
+
+  // Fetch patient details when selectedPatient changes (if needed)
+  useEffect(() => {
+    async function fetchPatientDetails() {
+      if (selectedPatient && selectedPatient.id) {
+        try {
+          const details = await apiService.getDoctorPatientById(selectedPatient.id);
+          setSelectedPatient(prev => ({ ...prev, ...details }));
+        } catch (err) {
+          // Ignore for now
+        }
+      }
+    }
+    if (selectedPatient && !selectedPatient.detailsLoaded) {
+      fetchPatientDetails();
+    }
+  }, [selectedPatient]);
 
   // Navigation handler
   const handleNavigation = (itemId) => {
@@ -247,22 +204,26 @@ export function DoctorPortal({ onNavigate }) {
     </header>
   );
 
-  // Handle saving clinical notes
-  const handleSave = () => {
+  // Handle saving clinical notes (placeholder, implement backend call)
+  const handleSave = async () => {
+    if (!selectedPatient) return;
     setLoading(true);
-    setTimeout(() => {
+    try {
+      // TODO: Implement backend call for saving clinical notes
+      // await apiService.saveClinicalNotes(selectedPatient.id, clinicalNotes);
+      alert('Clinical notes saved (backend integration needed)');
+    } catch (err) {
+      alert('Failed to save notes');
+    } finally {
       setLoading(false);
-      console.log('Saving clinical notes:', clinicalNotes);
-      alert('Clinical notes saved successfully!');
-    }, 1200);
+    }
   };
 
   return (
     <div className="doctor-portal-layout">
       <TopBar />
-      
-      {/* Main Content */}
       <main className="doctor-portal-main" role="main">
+        {error && <div className="alert alert-error">{error}</div>}
         {showPrescriptions ? (
           <div className="prescriptions-container">
             <button
@@ -277,61 +238,76 @@ export function DoctorPortal({ onNavigate }) {
           </div>
         ) : (
           <div className="doctor-dashboard-content">
-            <QueueManagement />
-            
-            {/* Optional: Patient Details Section */}
-            <div className="patient-details-section">
-              <h3>Selected Patient</h3>
-              <div className="patient-info-grid">
-                <div className="patient-info-item">
-                  <User size={16} />
-                  <span>{selectedPatient.name}</span>
-                </div>
-                <div className="patient-info-item">
-                  <Activity size={16} />
-                  <span>Vitals: {selectedPatient.vitals.heartRate}, {selectedPatient.vitals.bloodPressure}</span>
-                </div>
-                <div className="patient-info-item">
-                  <AlertCircle size={16} />
-                  <span>Symptoms: {selectedPatient.symptoms.join(', ')}</span>
+            {/* Patient List */}
+            <div className="patient-list-section">
+              <h3>Doctor Queue</h3>
+              <ul className="patient-list">
+                {patients.map((p) => (
+                  <li
+                    key={p.id}
+                    className={`patient-list-item${selectedPatient && selectedPatient.id === p.id ? ' selected' : ''}`}
+                    onClick={() => setSelectedPatient(p)}
+                  >
+                    <span>{p.name || p.id}</span> - <span>{p.urgency || ''}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {/* Patient Details Section */}
+            {selectedPatient && (
+              <div className="patient-details-section">
+                <h3>Selected Patient</h3>
+                <div className="patient-info-grid">
+                  <div className="patient-info-item">
+                    <User size={16} />
+                    <span>{selectedPatient.name}</span>
+                  </div>
+                  <div className="patient-info-item">
+                    <Activity size={16} />
+                    <span>Vitals: {selectedPatient.vitals ? selectedPatient.vitals.heartRate : ''}, {selectedPatient.vitals ? selectedPatient.vitals.bloodPressure : ''}</span>
+                  </div>
+                  <div className="patient-info-item">
+                    <AlertCircle size={16} />
+                    <span>Symptoms: {selectedPatient.symptoms ? selectedPatient.symptoms.join(', ') : ''}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-
+            )}
             {/* Clinical Notes Section */}
-            <div className="clinical-notes-section">
-              <h3>Clinical Notes</h3>
-              <textarea
-                className="clinical-notes-input"
-                value={clinicalNotes}
-                onChange={(e) => setClinicalNotes(e.target.value)}
-                placeholder="Enter clinical notes here..."
-                rows={4}
-              />
-              <div className="notes-actions">
-                <button
-                  className="doctor-action-btn"
-                  onClick={handleSave}
-                  disabled={loading}
-                  aria-label="Save clinical notes"
-                >
-                  <Save size={16} style={{ marginRight: '8px' }} />
-                  {loading ? 'Saving...' : 'Save Notes'}
-                </button>
-                <button
-                  className="doctor-action-btn secondary"
-                  onClick={() => setClinicalNotes('')}
-                  aria-label="Clear notes"
-                >
-                  <X size={16} style={{ marginRight: '8px' }} />
-                  Clear
-                </button>
+            {selectedPatient && (
+              <div className="clinical-notes-section">
+                <h3>Clinical Notes</h3>
+                <textarea
+                  className="clinical-notes-input"
+                  value={clinicalNotes}
+                  onChange={(e) => setClinicalNotes(e.target.value)}
+                  placeholder="Enter clinical notes here..."
+                  rows={4}
+                />
+                <div className="notes-actions">
+                  <button
+                    className="doctor-action-btn"
+                    onClick={handleSave}
+                    disabled={loading}
+                    aria-label="Save clinical notes"
+                  >
+                    <Save size={16} style={{ marginRight: '8px' }} />
+                    {loading ? 'Saving...' : 'Save Notes'}
+                  </button>
+                  <button
+                    className="doctor-action-btn secondary"
+                    onClick={() => setClinicalNotes('')}
+                    aria-label="Clear notes"
+                  >
+                    <X size={16} style={{ marginRight: '8px' }} />
+                    Clear
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
-        
-        {loading && <LoadingSpinner text="Saving..." fullScreen />}
+        {loading && <LoadingSpinner text="Loading..." fullScreen />}
       </main>
     </div>
   );

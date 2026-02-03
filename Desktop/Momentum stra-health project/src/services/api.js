@@ -77,7 +77,7 @@ async function apiRequest(endpoint, options = {}) {
 export const apiService = {
   
   // ==================== AUTHENTICATION ====================
-  
+  // ==================== AUTHENTICATION ====================
   /**
    * User login
    * @param {object} credentials - { username, password, role }
@@ -128,10 +128,67 @@ export const apiService = {
   },
 
   /**
+   * Get user profile (GET /api/v1/auth/profile)
+   */
+  async getProfile() {
+    return apiRequest('/api/v1/auth/profile', { method: 'GET' });
+  },
+
+  /**
+   * Update user profile (PUT /api/v1/auth/profile)
+   */
+  async updateProfile(profileData) {
+    return apiRequest('/api/v1/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(profileData)
+    });
+  },
+
+  /**
+   * Refresh JWT token (POST /api/v1/auth/refresh-token)
+   */
+  async refreshToken(refreshToken) {
+    return apiRequest('/api/v1/auth/refresh-token', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken })
+    });
+  },
+
+  /**
+   * Forgot password (POST /api/v1/auth/forgot-password)
+   */
+  async forgotPassword(email) {
+    return apiRequest('/api/v1/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    });
+  },
+
+  /**
+   * Reset password (POST /api/v1/auth/reset-password)
+   */
+  async resetPassword(resetToken, newPassword) {
+    return apiRequest('/api/v1/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ resetToken, newPassword })
+    });
+  },
+
+  /**
+   * Change password (POST /api/v1/auth/change-password)
+   */
+  async changePassword(currentPassword, newPassword) {
+    return apiRequest('/api/v1/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword })
+    });
+  },
+
+  /**
    * Verify authentication token
    * @returns {Promise<{valid, user}>}
    */
-  // No /auth/verify endpoint in swagger.json, consider removing or updating if backend adds it
+  // No /auth/verify endpoint in swagger.json
 
   // ==================== PATIENT MANAGEMENT ====================
   
@@ -140,7 +197,6 @@ export const apiService = {
    * @param {object} filters - Optional filters { department, urgency, status }
    * @returns {Promise<Array>}
    */
-  // TODO: Update patient endpoints to use /api/v1/triage/patients and /api/v1/doctor/patients as per swagger.json
   /**
    * Register new patient (POST /api/v1/triage/patients)
    * @param {object} patientData
@@ -160,6 +216,23 @@ export const apiService = {
    */
   async getPatientById(patientId) {
     return apiRequest(`/api/v1/triage/patients/${patientId}`, { method: 'GET' });
+  },
+
+  /**
+   * Perform triage (POST /api/v1/triage/triage)
+   */
+  async performTriage(triageData) {
+    return apiRequest('/api/v1/triage/triage', {
+      method: 'POST',
+      body: JSON.stringify(triageData)
+    });
+  },
+
+  /**
+   * Get triage statistics (GET /api/v1/triage/statistics)
+   */
+  async getTriageStatistics() {
+    return apiRequest('/api/v1/triage/statistics', { method: 'GET' });
   },
 
   /**
@@ -188,21 +261,14 @@ export const apiService = {
    * @param {object} updates - Fields to update
    * @returns {Promise<object>}
    */
-  async updatePatient(patientId, updates) {
-    return apiRequest(`/patients/${patientId}`, {
-      method: 'PUT',
-      body: JSON.stringify(updates)
-    });
-  },
+  // No update endpoint for patient in swagger.json
 
   /**
    * Get patient medical history
    * @param {string} patientId - STRA patient ID
    * @returns {Promise<Array>}
    */
-  async getPatientHistory(patientId) {
-    return apiRequest(`/patients/${patientId}/history`, { method: 'GET' });
-  },
+  // Already implemented above
 
   // ==================== QUEUE MANAGEMENT ====================
   
@@ -220,21 +286,6 @@ export const apiService = {
   },
 
   /**
-   * Get queue for specific department
-   * @param {string} department - Department name
-   * @returns {Promise<Array>}
-   */
-  async getDepartmentQueue(department) {
-    return apiRequest(`/queues/${encodeURIComponent(department)}`, { method: 'GET' });
-  },
-
-  /**
-   * Update patient status in queue
-   * @param {string} patientId - STRA patient ID
-   * @param {string} status - New status (WAITING, IN_PROGRESS, COMPLETED)
-   * @returns {Promise<object>}
-   */
-  /**
    * Update queue position (PATCH /api/v1/triage/queue/{queueId}/position)
    * @param {string} queueId
    * @param {number} position
@@ -248,17 +299,38 @@ export const apiService = {
   },
 
   /**
-   * Transfer patient to different department
-   * @param {string} patientId - STRA patient ID
-   * @param {string} department - Target department
-   * @returns {Promise<object>}
+   * Call next patient (POST /api/v1/triage/queue/{departmentId}/call-next)
    */
-  async transferPatient(patientId, department) {
-    return apiRequest(`/queues/${patientId}/transfer`, {
+  async callNextPatient(departmentId, doctorId) {
+    return apiRequest(`/api/v1/triage/queue/${departmentId}/call-next`, {
       method: 'POST',
-      body: JSON.stringify({ department })
+      body: JSON.stringify({ doctorId })
     });
   },
+
+  /**
+   * Complete patient treatment (POST /api/v1/triage/queue/{queueId}/complete)
+   */
+  async completePatient(queueId) {
+    return apiRequest(`/api/v1/triage/queue/${queueId}/complete`, {
+      method: 'POST' });
+  },
+
+  /**
+   * Prioritize critical patients (POST /api/v1/triage/queue/{departmentId}/prioritize)
+   */
+  async prioritizeQueue(departmentId) {
+    return apiRequest(`/api/v1/triage/queue/${departmentId}/prioritize`, {
+      method: 'POST' });
+  },
+
+  /**
+   * Update patient status in queue
+   * @param {string} patientId - STRA patient ID
+   * @param {string} status - New status (WAITING, IN_PROGRESS, COMPLETED)
+   * @returns {Promise<object>}
+   */
+  // No transfer endpoint in swagger.json
 
   // ==================== DOCTOR PORTAL ====================
   
@@ -268,7 +340,84 @@ export const apiService = {
    * @param {string} notes - Clinical observations
    * @returns {Promise<object>}
    */
-  // TODO: Add doctor endpoints as per swagger.json (e.g., /api/v1/doctor/patients/{patientId}, /api/v1/doctor/prescriptions, etc.)
+
+  /**
+   * Get doctor queue (GET /api/v1/doctor/queue)
+   */
+  async getDoctorQueue() {
+    return apiRequest('/api/v1/doctor/queue', { method: 'GET' });
+  },
+
+  /**
+   * Get patient details (GET /api/v1/doctor/patients/{patientId})
+   */
+  async getDoctorPatientById(patientId) {
+    return apiRequest(`/api/v1/doctor/patients/${patientId}`, { method: 'GET' });
+  },
+
+  /**
+   * Order lab tests (POST /api/v1/doctor/lab-orders)
+   */
+  async orderLabTests(labOrder) {
+    return apiRequest('/api/v1/doctor/lab-orders', {
+      method: 'POST',
+      body: JSON.stringify(labOrder)
+    });
+  },
+
+  /**
+   * Order diagnostic imaging (POST /api/v1/doctor/imaging)
+   */
+  async orderImaging(imagingOrder) {
+    return apiRequest('/api/v1/doctor/imaging', {
+      method: 'POST',
+      body: JSON.stringify(imagingOrder)
+    });
+  },
+
+  /**
+   * Create prescription (POST /api/v1/doctor/prescriptions)
+   */
+  async createPrescription(prescription) {
+    return apiRequest('/api/v1/doctor/prescriptions', {
+      method: 'POST',
+      body: JSON.stringify(prescription)
+    });
+  },
+
+  /**
+   * Record vital signs (POST /api/v1/doctor/patients/{patientId}/vitals)
+   */
+  async recordVitals(patientId, vitals) {
+    return apiRequest(`/api/v1/doctor/patients/${patientId}/vitals`, {
+      method: 'POST',
+      body: JSON.stringify(vitals)
+    });
+  },
+
+  /**
+   * Update patient disposition (PUT /api/v1/doctor/patients/{patientId}/disposition)
+   */
+  async updateDisposition(patientId, dispositionData) {
+    return apiRequest(`/api/v1/doctor/patients/${patientId}/disposition`, {
+      method: 'PUT',
+      body: JSON.stringify(dispositionData)
+    });
+  },
+
+  /**
+   * Get patient lab results (GET /api/v1/doctor/patients/{patientId}/lab-results)
+   */
+  async getLabResults(patientId) {
+    return apiRequest(`/api/v1/doctor/patients/${patientId}/lab-results`, { method: 'GET' });
+  },
+
+  /**
+   * Get doctor statistics (GET /api/v1/doctor/statistics)
+   */
+  async getDoctorStatistics() {
+    return apiRequest('/api/v1/doctor/statistics', { method: 'GET' });
+  },
 
   /**
    * Create medical orders (lab tests, imaging)
@@ -276,12 +425,7 @@ export const apiService = {
    * @param {object} orders - { labTests: [], imaging: [] }
    * @returns {Promise<object>}
    */
-  async createOrders(patientId, orders) {
-    return apiRequest(`/patients/${patientId}/orders`, {
-      method: 'POST',
-      body: JSON.stringify(orders)
-    });
-  },
+  // Use orderLabTests and orderImaging above
 
   /**
    * Create prescription
@@ -289,21 +433,14 @@ export const apiService = {
    * @param {object} prescription - Medication details
    * @returns {Promise<object>}
    */
-  async createPrescription(patientId, prescription) {
-    return apiRequest(`/patients/${patientId}/prescriptions`, {
-      method: 'POST',
-      body: JSON.stringify(prescription)
-    });
-  },
+  // Use createPrescription above
 
   /**
    * Get all prescriptions for a patient
    * @param {string} patientId - STRA patient ID
    * @returns {Promise<Array>}
    */
-  async getPrescriptions(patientId) {
-    return apiRequest(`/patients/${patientId}/prescriptions`, { method: 'GET' });
-  },
+  // Not in swagger.json; implement if backend supports
 
   /**
    * Discharge patient
@@ -311,12 +448,7 @@ export const apiService = {
    * @param {object} dischargeInfo - Discharge summary
    * @returns {Promise<object>}
    */
-  async dischargePatient(patientId, dischargeInfo) {
-    return apiRequest(`/patients/${patientId}/discharge`, {
-      method: 'POST',
-      body: JSON.stringify(dischargeInfo)
-    });
-  },
+  // Not in swagger.json
 
   // ==================== RESOURCE MANAGEMENT ====================
   
@@ -324,17 +456,57 @@ export const apiService = {
    * Get all resources (beds, staff, equipment)
    * @returns {Promise<object>}
    */
-  async getResources() {
-    return apiRequest('/resources', { method: 'GET' });
+  async getResourceDashboard() {
+    return apiRequest('/api/v1/resources/dashboard', { method: 'GET' });
+  },
+
+  /**
+   * Get resource availability (GET /api/v1/resources/availability)
+   */
+  async getResourceAvailability() {
+    return apiRequest('/api/v1/resources/availability', { method: 'GET' });
+  },
+
+  /**
+   * Predictive resource load (GET /api/v1/resources/predictive-load)
+   */
+  async getPredictiveResourceLoad() {
+    return apiRequest('/api/v1/resources/predictive-load', { method: 'GET' });
+  },
+
+  /**
+   * Allocate resource (POST /api/v1/resources/{resourceId}/allocate)
+   */
+  async allocateResource(resourceId, patientId) {
+    return apiRequest(`/api/v1/resources/${resourceId}/allocate`, {
+      method: 'POST',
+      body: JSON.stringify({ patientId })
+    });
+  },
+
+  /**
+   * Release resource (POST /api/v1/resources/{resourceId}/release)
+   */
+  async releaseResource(resourceId) {
+    return apiRequest(`/api/v1/resources/${resourceId}/release`, {
+      method: 'POST' });
+  },
+
+  /**
+   * Set resource maintenance (POST /api/v1/resources/{resourceId}/maintenance)
+   */
+  async setResourceMaintenance(resourceId, maintenanceData) {
+    return apiRequest(`/api/v1/resources/${resourceId}/maintenance`, {
+      method: 'POST',
+      body: JSON.stringify(maintenanceData)
+    });
   },
 
   /**
    * Get bed availability
    * @returns {Promise<object>}
    */
-  async getBedAvailability() {
-    return apiRequest('/resources/beds', { method: 'GET' });
-  },
+  // Not in swagger.json
 
   /**
    * Update bed status
@@ -342,30 +514,20 @@ export const apiService = {
    * @param {string} status - New status (AVAILABLE, OCCUPIED, CLEANING)
    * @returns {Promise<object>}
    */
-  async updateBedStatus(bedId, status) {
-    return apiRequest(`/resources/beds/${bedId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ status })
-    });
-  },
+  // Not in swagger.json
 
   /**
    * Get staff availability
    * @param {string} role - Optional role filter (doctor, nurse, technician)
    * @returns {Promise<Array>}
    */
-  async getStaffAvailability(role = null) {
-    const query = role ? `?role=${role}` : '';
-    return apiRequest(`/resources/staff${query}`, { method: 'GET' });
-  },
+  // Not in swagger.json
 
   /**
    * Get equipment status
    * @returns {Promise<Array>}
    */
-  async getEquipmentStatus() {
-    return apiRequest('/resources/equipment', { method: 'GET' });
-  },
+  // Not in swagger.json
 
   /**
    * Update equipment status
@@ -373,12 +535,7 @@ export const apiService = {
    * @param {string} status - New status (AVAILABLE, IN_USE, MAINTENANCE)
    * @returns {Promise<object>}
    */
-  async updateEquipmentStatus(equipmentId, status) {
-    return apiRequest(`/resources/equipment/${equipmentId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ status })
-    });
-  },
+  // Not in swagger.json
 
   // ==================== INVENTORY MANAGEMENT ====================
   
@@ -387,9 +544,8 @@ export const apiService = {
    * @param {object} filters - Optional filters { category, status }
    * @returns {Promise<Array>}
    */
-  async getInventory(filters = {}) {
-    const queryParams = new URLSearchParams(filters).toString();
-    return apiRequest(`/inventory?${queryParams}`, { method: 'GET' });
+  async getMedications() {
+    return apiRequest('/api/v1/inventory/medications', { method: 'GET' });
   },
 
   /**
@@ -397,21 +553,14 @@ export const apiService = {
    * @param {string} itemId - Item identifier
    * @returns {Promise<object>}
    */
-  async getInventoryItem(itemId) {
-    return apiRequest(`/inventory/${itemId}`, { method: 'GET' });
-  },
+  // Not in swagger.json
 
   /**
    * Add new medication to inventory
    * @param {object} itemData - Medication details
    * @returns {Promise<object>}
    */
-  async addInventoryItem(itemData) {
-    return apiRequest('/inventory', {
-      method: 'POST',
-      body: JSON.stringify(itemData)
-    });
-  },
+  // Not in swagger.json
 
   /**
    * Update inventory stock levels
@@ -419,10 +568,10 @@ export const apiService = {
    * @param {number} quantity - New quantity
    * @returns {Promise<object>}
    */
-  async updateInventoryStock(itemId, quantity) {
-    return apiRequest(`/inventory/${itemId}/stock`, {
-      method: 'PATCH',
-      body: JSON.stringify({ quantity })
+  async updateMedicationStock(medicationId, stockUpdate) {
+    return apiRequest(`/api/v1/inventory/medications/${medicationId}/stock`, {
+      method: 'PUT',
+      body: JSON.stringify(stockUpdate)
     });
   },
 
@@ -431,7 +580,7 @@ export const apiService = {
    * @returns {Promise<Array>}
    */
   async getLowStockAlerts() {
-    return apiRequest('/inventory/alerts', { method: 'GET' });
+    return apiRequest('/api/v1/inventory/alerts/low-stock', { method: 'GET' });
   },
 
   /**
@@ -439,12 +588,7 @@ export const apiService = {
    * @param {Array} items - Array of {itemId, quantity}
    * @returns {Promise<object>}
    */
-  async generatePurchaseOrder(items) {
-    return apiRequest('/inventory/purchase-orders', {
-      method: 'POST',
-      body: JSON.stringify({ items })
-    });
-  },
+  // Not in swagger.json
 
   // ==================== ANALYTICS ====================
   
@@ -453,42 +597,33 @@ export const apiService = {
    * @param {object} dateRange - { startDate, endDate }
    * @returns {Promise<object>}
    */
-  async getAnalytics(dateRange = {}) {
-    const queryParams = new URLSearchParams(dateRange).toString();
-    return apiRequest(`/analytics?${queryParams}`, { method: 'GET' });
+  async getAnalytics() {
+    return apiRequest('/api/v1/analytics', { method: 'GET' });
   },
 
   /**
    * Get patient volume statistics
    * @returns {Promise<object>}
    */
-  async getPatientVolumeStats() {
-    return apiRequest('/analytics/patient-volume', { method: 'GET' });
-  },
+  // Not in swagger.json
 
   /**
    * Get wait time statistics
    * @returns {Promise<object>}
    */
-  async getWaitTimeStats() {
-    return apiRequest('/analytics/wait-times', { method: 'GET' });
-  },
+  // Not in swagger.json
 
   /**
    * Get department performance metrics
    * @returns {Promise<Array>}
    */
-  async getDepartmentPerformance() {
-    return apiRequest('/analytics/departments', { method: 'GET' });
-  },
+  // Not in swagger.json
 
   /**
    * Get resource utilization metrics
    * @returns {Promise<object>}
    */
-  async getResourceUtilization() {
-    return apiRequest('/analytics/resources', { method: 'GET' });
-  },
+  // Not in swagger.json
 
   /**
    * Export analytics report
@@ -496,20 +631,7 @@ export const apiService = {
    * @param {object} filters - Report filters
    * @returns {Promise<Blob>}
    */
-  async exportReport(format, filters = {}) {
-    const queryParams = new URLSearchParams({ format, ...filters }).toString();
-    const response = await fetch(`${API_CONFIG.BASE_URL}/analytics/export?${queryParams}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to export report');
-    }
-    
-    return await response.blob();
-  },
+  // Not in swagger.json
 
   // ==================== NOTIFICATIONS ====================
   
@@ -517,20 +639,14 @@ export const apiService = {
    * Get notifications for current user
    * @returns {Promise<Array>}
    */
-  async getNotifications() {
-    return apiRequest('/notifications', { method: 'GET' });
-  },
+  // Not in swagger.json
 
   /**
    * Mark notification as read
    * @param {string} notificationId - Notification identifier
    * @returns {Promise<object>}
    */
-  async markNotificationRead(notificationId) {
-    return apiRequest(`/notifications/${notificationId}/read`, {
-      method: 'PATCH'
-    });
-  },
+  // Not in swagger.json
 
   // ==================== ADMIN FUNCTIONS ====================
   
@@ -539,7 +655,7 @@ export const apiService = {
    * @returns {Promise<Array>}
    */
   async getAllUsers() {
-    return apiRequest('/admin/users', { method: 'GET' });
+    return apiRequest('/api/v1/auth/users', { method: 'GET' });
   },
 
   /**
@@ -547,12 +663,7 @@ export const apiService = {
    * @param {object} userData - User details
    * @returns {Promise<object>}
    */
-  async createUser(userData) {
-    return apiRequest('/admin/users', {
-      method: 'POST',
-      body: JSON.stringify(userData)
-    });
-  },
+  // Not in swagger.json
 
   /**
    * Update user role/permissions (Admin only)
@@ -560,29 +671,25 @@ export const apiService = {
    * @param {object} updates - Updates to apply
    * @returns {Promise<object>}
    */
-  async updateUser(userId, updates) {
-    return apiRequest(`/admin/users/${userId}`, {
-      method: 'PUT',
-      body: JSON.stringify(updates)
-    });
-  },
+  // Not in swagger.json
 
   /**
    * Get system logs (Admin only)
    * @param {object} filters - Optional filters
    * @returns {Promise<Array>}
    */
-  async getSystemLogs(filters = {}) {
-    const queryParams = new URLSearchParams(filters).toString();
-    return apiRequest(`/admin/logs?${queryParams}`, { method: 'GET' });
-  },
+  // Not in swagger.json
 
   /**
    * Get system health status (Admin only)
    * @returns {Promise<object>}
    */
-  async getSystemHealth() {
-    return apiRequest('/admin/health', { method: 'GET' });
+  async getHealth() {
+    return apiRequest('/api/v1/health', { method: 'GET' });
+  },
+
+  async getDbHealth() {
+    return apiRequest('/api/v1/health/db', { method: 'GET' });
   }
 };
 

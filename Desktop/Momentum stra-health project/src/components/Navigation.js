@@ -14,7 +14,7 @@
 
 import React, { useState } from 'react';
 import NotificationButton from './common/NotificationButton';
-import { Activity, Stethoscope, Users, LayoutDashboard, Package, BarChart3, LogOut, Menu, X, Bell } from 'lucide-react';
+import { Activity, Stethoscope, Users, LayoutDashboard, Package, BarChart3, LogOut, Menu, X } from 'lucide-react';
 
 export function Navigation({ currentScreen, onNavigate, user, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

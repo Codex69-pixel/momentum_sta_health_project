@@ -1,30 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Clock, Users, AlertCircle, CheckCircle, Filter, Search, 
-  MoreVertical, Phone, MapPin, AlertTriangle, Activity, 
-  Eye, ChevronRight, ChevronLeft, X, Download
+  MoreVertical, Phone, AlertTriangle, 
+  Eye, X
 } from 'lucide-react';
 import './QueueManagement.css';
 import LoadingSpinner from './common/LoadingSpinner';
-import Papa from 'papaparse';
-import TablePagination from './common/TablePagination';
+// import Papa from 'papaparse';
+// import TablePagination from './common/TablePagination';
 
-// Mock data for the queue
-const mockPatients = [
-  { id: 'P001', name: 'John Smith', age: 45, position: 1, waitTime: 15, urgency: 'RED', status: 'WAITING', chief: 'Chest Pain', department: 'EMERGENCY' },
-  { id: 'P002', name: 'Sarah Johnson', age: 32, position: 2, waitTime: 25, urgency: 'YELLOW', status: 'IN_PROGRESS', chief: 'Fever & Cough', department: 'EMERGENCY' },
-  { id: 'P003', name: 'Michael Chen', age: 58, position: 3, waitTime: 35, urgency: 'GREEN', status: 'WAITING', chief: 'Back Pain', department: 'EMERGENCY' },
-  { id: 'P004', name: 'Emma Wilson', age: 28, position: 4, waitTime: 45, urgency: 'RED', status: 'WAITING', chief: 'Shortness of Breath', department: 'CARDIOLOGY' },
-  { id: 'P005', name: 'Robert Brown', age: 65, position: 5, waitTime: 20, urgency: 'YELLOW', status: 'IN_PROGRESS', chief: 'Headache', department: 'NEUROLOGY' },
-  { id: 'P006', name: 'Lisa Davis', age: 41, position: 6, waitTime: 30, urgency: 'GREEN', status: 'WAITING', chief: 'Knee Injury', department: 'ORTHOPEDICS' },
-];
 
-const mockDepartments = [
-  { id: 'EMERGENCY', name: 'Emergency Room', count: 3 },
-  { id: 'CARDIOLOGY', name: 'Cardiology', count: 1 },
-  { id: 'NEUROLOGY', name: 'Neurology', count: 1 },
-  { id: 'ORTHOPEDICS', name: 'Orthopedics', count: 1 },
-];
+import { apiService } from '../services/api';
 
 const urgencyConfig = {
   RED: {
@@ -47,18 +33,59 @@ const urgencyConfig = {
   }
 };
 
+
 const QueueManagement = () => {
+  const [departments, setDepartments] = useState([]);
   const [selectedDept, setSelectedDept] = useState('ALL');
-  const [filteredPatients, setFilteredPatients] = useState(mockPatients);
+  const [patients, setPatients] = useState([]);
+  const [filteredPatients, setFilteredPatients] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [urgencyFilter, setUrgencyFilter] = useState('ALL');
   const [showFilters, setShowFilters] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [sortKey, setSortKey] = useState('name');
-  const [sortOrder, setSortOrder] = useState('asc');
+  const [page] = useState(1);
+  const [sortKey] = useState('name');
+  const [sortOrder] = useState('asc');
   const pageSize = 5;
+
+
+  // Fetch departments and initial queue
+  useEffect(() => {
+    async function fetchDepartmentsAndQueue() {
+      setLoading(true);
+
+      try {
+        // For demo, hardcode departments or fetch from backend if available
+        const deptList = [
+          { id: 'EMERGENCY', name: 'Emergency Room' },
+          { id: 'CARDIOLOGY', name: 'Cardiology' },
+          { id: 'NEUROLOGY', name: 'Neurology' },
+          { id: 'ORTHOPEDICS', name: 'Orthopedics' },
+        ];
+        setDepartments(deptList);
+        // Fetch queue for all departments (could be improved to fetch per department)
+        let allPatients = [];
+        for (const dept of deptList) {
+          try {
+            const queue = await apiService.getDepartmentQueue(dept.id);
+            if (Array.isArray(queue)) {
+              allPatients = allPatients.concat(queue.map(p => ({ ...p, department: dept.id })));
+            }
+          } catch (e) {
+            // Ignore department fetch error
+          }
+        }
+        setPatients(allPatients);
+        setFilteredPatients(allPatients);
+      } catch (err) {
+
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchDepartmentsAndQueue();
+  }, []);
 
   const getUrgencyConfig = (urgency) => {
     return urgencyConfig[urgency] || urgencyConfig.GREEN;
@@ -66,34 +93,27 @@ const QueueManagement = () => {
 
   // Filter patients based on selected department, search term, and urgency
   useEffect(() => {
-    let filtered = [...mockPatients];
-    
-    // Filter by department
+    let filtered = [...patients];
     if (selectedDept !== 'ALL') {
       filtered = filtered.filter(patient => patient.department === selectedDept);
     }
-    
-    // Filter by search term
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(patient => 
-        patient.name.toLowerCase().includes(term) ||
-        patient.id.toLowerCase().includes(term) ||
-        patient.chief.toLowerCase().includes(term)
+      filtered = filtered.filter(patient =>
+        (patient.name && patient.name.toLowerCase().includes(term)) ||
+        (patient.id && patient.id.toLowerCase().includes(term)) ||
+        (patient.chief && patient.chief.toLowerCase().includes(term))
       );
     }
-    
-    // Filter by urgency
     if (urgencyFilter !== 'ALL') {
       filtered = filtered.filter(patient => patient.urgency === urgencyFilter);
     }
-    
     setFilteredPatients(filtered);
-  }, [selectedDept, searchTerm, urgencyFilter]);
+  }, [selectedDept, searchTerm, urgencyFilter, patients]);
 
-  const currentQueue = selectedDept === 'ALL' 
-    ? { patients: mockPatients } 
-    : { patients: mockPatients.filter(p => p.department === selectedDept) };
+  const currentQueue = selectedDept === 'ALL'
+    ? { patients }
+    : { patients: patients.filter(p => p.department === selectedDept) };
 
   const handleResetFilters = () => {
     setSelectedDept('ALL');
@@ -103,31 +123,45 @@ const QueueManagement = () => {
   };
 
   // Example: Simulate loading on refresh
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      let allPatients = [];
+      for (const dept of departments) {
+        try {
+          const queue = await apiService.getDepartmentQueue(dept.id);
+          if (Array.isArray(queue)) {
+            allPatients = allPatients.concat(queue.map(p => ({ ...p, department: dept.id })));
+          }
+        } catch (e) {}
+      }
+      setPatients(allPatients);
+      setFilteredPatients(allPatients);
+    } catch (err) {
+
+    } finally {
       setLoading(false);
-      // ...refresh logic...
-    }, 1200);
+    }
   };
 
-  const handleExportCSV = () => {
-    const csv = Papa.unparse(filteredPatients.map(patient => ({
-      Name: patient.name,
-      Department: patient.department,
-      Urgency: patient.urgency,
-      Status: patient.status,
-      'Arrival Time': patient.arrivalTime
-    })));
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'queue.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  // const handleExportCSV = () => {
+  //   const csv = Papa.unparse(filteredPatients.map(patient => ({
+  //     Name: patient.name,
+  //     Department: patient.department,
+  //     Urgency: patient.urgency,
+  //     Status: patient.status,
+  //     'Arrival Time': patient.arrivalTime
+  //   })));
+  //   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  //   const url = URL.createObjectURL(blob);
+  //   const link = document.createElement('a');
+  //   link.href = url;
+  //   link.setAttribute('download', 'queue.csv');
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // };
 
   const sortedPatients = [...filteredPatients].sort((a, b) => {
     if (a[sortKey] < b[sortKey]) return sortOrder === 'asc' ? -1 : 1;
@@ -179,12 +213,11 @@ const QueueManagement = () => {
                   <div className="flex justify-between items-center">
                     <span className="font-medium">All Departments</span>
                     <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                      {mockPatients.length}
+                      {patients.length}
                     </span>
                   </div>
                 </button>
-                
-                {mockDepartments.map((dept) => (
+                {departments.map((dept) => (
                   <button
                     key={dept.id}
                     className={`w-full text-left p-3 rounded-xl transition-colors ${selectedDept === dept.id ? 'bg-blue-50 border border-blue-200 text-blue-700' : 'hover:bg-gray-50 border border-transparent'}`}
@@ -193,7 +226,7 @@ const QueueManagement = () => {
                     <div className="flex justify-between items-center">
                       <span className="font-medium">{dept.name}</span>
                       <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                        {dept.count}
+                        {patients.filter(p => p.department === dept.id).length}
                       </span>
                     </div>
                   </button>
@@ -211,7 +244,7 @@ const QueueManagement = () => {
                     <span className="font-medium text-gray-700">Critical</span>
                   </div>
                   <span className="text-red-700 font-bold">
-                    {mockPatients.filter(p => p.urgency === 'RED').length}
+                    {patients.filter(p => p.urgency === 'RED').length}
                   </span>
                 </div>
                 
@@ -221,7 +254,7 @@ const QueueManagement = () => {
                     <span className="font-medium text-gray-700">Moderate</span>
                   </div>
                   <span className="text-yellow-700 font-bold">
-                    {mockPatients.filter(p => p.urgency === 'YELLOW').length}
+                    {patients.filter(p => p.urgency === 'YELLOW').length}
                   </span>
                 </div>
                 
@@ -231,7 +264,7 @@ const QueueManagement = () => {
                     <span className="font-medium text-gray-700">Stable</span>
                   </div>
                   <span className="text-green-700 font-bold">
-                    {mockPatients.filter(p => p.urgency === 'GREEN').length}
+                    {patients.filter(p => p.urgency === 'GREEN').length}
                   </span>
                 </div>
               </div>
@@ -397,7 +430,7 @@ const QueueManagement = () => {
             {currentQueue && (
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">
-                  Queue Statistics - {selectedDept === 'ALL' ? 'All Departments' : mockDepartments.find(d => d.id === selectedDept)?.name}
+                  Queue Statistics - {selectedDept === 'ALL' ? 'All Departments' : departments.find(d => d.id === selectedDept)?.name}
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

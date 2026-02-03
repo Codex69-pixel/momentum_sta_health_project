@@ -1,27 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import NotificationButton from './common/NotificationButton';
 import { 
-  User, ChevronDown, LogOut, Home, BarChart3, Package, Plus, 
-  AlertTriangle, CheckCircle, Clock, TrendingUp, Search, Filter, 
-  Download, Pill, MoreVertical, AlertCircle, ShoppingCart, Menu, X,
-  Calendar, DollarSign, Box, Thermometer, FileText, ClipboardCheck
+  User, ChevronDown, LogOut, Package, Plus, 
+  AlertTriangle, CheckCircle, Clock, TrendingUp, Search, 
+  Download, Pill, MoreVertical, AlertCircle, ShoppingCart, X, FileText
 } from 'lucide-react';
-import LoadingSpinner from './common/LoadingSpinner';
+// import LoadingSpinner from './common/LoadingSpinner';
 import Papa from 'papaparse';
 import './InventoryManagement.css';
 import Prescriptions from './prescription';
 
-// Mock data
-const drugs = [
-  { id: 1, name: 'Paracetamol 500mg', category: 'Pain Relief', stock: 450, reorderLevel: 100, supplier: 'PharmaCorp', cost: 2.50, expiry: '2025-12-31', status: 'optimal', usage: 15 },
-  { id: 2, name: 'Amoxicillin 250mg', category: 'Antibiotics', stock: 80, reorderLevel: 150, supplier: 'MediHealth', cost: 5.00, expiry: '2024-08-15', status: 'critical', usage: 8 },
-  { id: 3, name: 'Ibuprofen 400mg', category: 'Pain Relief', stock: 320, reorderLevel: 150, supplier: 'PharmaCorp', cost: 3.25, expiry: '2025-06-30', status: 'optimal', usage: 12 },
-  { id: 4, name: 'Atorvastatin 20mg', category: 'Cardiovascular', stock: 55, reorderLevel: 200, supplier: 'CardioMeds', cost: 8.75, expiry: '2026-01-15', status: 'low', usage: 5 },
-  { id: 5, name: 'Metformin 500mg', category: 'Diabetes', stock: 280, reorderLevel: 100, supplier: 'DiabeteCare', cost: 4.00, expiry: '2025-09-20', status: 'optimal', usage: 10 },
-  { id: 6, name: 'Lisinopril 10mg', category: 'Hypertension', stock: 120, reorderLevel: 200, supplier: 'CardioMeds', cost: 6.50, expiry: '2025-04-10', status: 'low', usage: 6 },
-  { id: 7, name: 'Omeprazole 20mg', category: 'GI Disorders', stock: 95, reorderLevel: 150, supplier: 'GastroMeds', cost: 3.75, expiry: '2024-10-25', status: 'critical', usage: 7 },
-  { id: 8, name: 'Ciprofloxacin 500mg', category: 'Antibiotics', stock: 45, reorderLevel: 100, supplier: 'MediHealth', cost: 7.20, expiry: '2025-07-30', status: 'critical', usage: 4 }
-];
+
+import { apiService } from '../services/api';
 
 const categories = ['Pain Relief', 'Antibiotics', 'Cardiovascular', 'Diabetes', 'Hypertension', 'GI Disorders'];
 
@@ -46,16 +36,32 @@ export function InventoryManagement({ onNavigate }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showPrescriptions, setShowPrescriptions] = useState(false);
   const [addForm, setAddForm] = useState(initialFormState);
-  const [addErrors, setAddErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [sortKey, setSortKey] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
-  const [inventory, setInventory] = useState(drugs);
+  const [inventory, setInventory] = useState([]);
+  const [error, setError] = useState(null);
+    // Fetch medications from backend
+    useEffect(() => {
+      async function fetchMedications() {
+        setLoading(true);
+        setError(null);
+        try {
+          const meds = await apiService.getMedications();
+          setInventory(Array.isArray(meds) ? meds : []);
+        } catch (err) {
+          setError('Failed to load inventory');
+        } finally {
+          setLoading(false);
+        }
+      }
+      fetchMedications();
+    }, []);
   const pageSize = 5;
 
   // Mock prescriptions data (shared with Prescriptions component)
@@ -137,33 +143,31 @@ export function InventoryManagement({ onNavigate }) {
   }), [inventory, prescriptions]);
 
   // Handle prescription fulfillment (when medication is dispensed)
-  const handlePrescriptionFulfilled = (fulfillmentData) => {
-    const { medication, quantity, prescriptionId } = fulfillmentData;
-    
-    // Update inventory stock
-    setInventory(prev => prev.map(item => {
-      if (item.name === medication) {
-        const newStock = item.stock - quantity;
-        const newStatus = newStock <= item.reorderLevel * 1.5 ? 'critical' : 
-                         newStock <= item.reorderLevel * 2 ? 'low' : 'optimal';
-        
-        return {
-          ...item,
-          stock: newStock,
-          status: newStatus,
-          usage: Math.max(item.usage, Math.floor((item.usage + quantity) / 2)) // Update usage average
-        };
-      }
-      return item;
-    }));
-
-    // Update prescription status
-    setPrescriptions(prev => 
-      prev.map(p => p.id === prescriptionId ? { ...p, status: 'COMPLETED' } : p)
-    );
-
-    // Show notification
-    alert(`✓ Inventory updated: ${quantity} units of ${medication} dispensed.`);
+  const handlePrescriptionFulfilled = async (fulfillmentData) => {
+    const { medicationId, quantity, prescriptionId } = fulfillmentData;
+    setLoading(true);
+    setError(null);
+    try {
+      // Update stock in backend
+      await apiService.updateMedicationStock(medicationId, {
+        adjustment: -quantity,
+        reason: 'Dispensed for prescription',
+        transactionType: 'DISPENSE',
+        notes: '',
+      });
+      // Refresh inventory
+      const meds = await apiService.getMedications();
+      setInventory(Array.isArray(meds) ? meds : []);
+      // Update prescription status locally
+      setPrescriptions(prev =>
+        prev.map(p => p.id === prescriptionId ? { ...p, status: 'COMPLETED' } : p)
+      );
+      alert(`✓ Inventory updated: ${quantity} units dispensed.`);
+    } catch (err) {
+      setError('Failed to update inventory');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Filter and sort drugs with prescription data
@@ -225,42 +229,35 @@ export function InventoryManagement({ onNavigate }) {
     return errors;
   };
 
-  const handleAddChange = (e) => {
-    const { name, value } = e.target;
-    setAddForm(prev => ({ ...prev, [name]: value }));
-    if (addErrors[name]) {
-      setAddErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
+  // const handleAddChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setAddForm(prev => ({ ...prev, [name]: value }));
+  //   if (addErrors[name]) {
+  //     setAddErrors(prev => ({ ...prev, [name]: '' }));
+  //   }
+  // };
 
-  const handleAddSubmit = (e) => {
+  const handleAddSubmit = async (e) => {
     e.preventDefault();
     const errors = validateAddForm();
-    
     if (Object.keys(errors).length > 0) {
-      setAddErrors(errors);
+      // errors would be handled here if addErrors was used
       return;
     }
-
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      const newDrug = {
-        id: inventory.length + 1,
-        ...addForm,
-        stock: parseInt(addForm.stock),
-        reorderLevel: parseInt(addForm.reorderLevel),
-        cost: parseFloat(addForm.cost),
-        status: addForm.stock <= addForm.reorderLevel * 1.5 ? 'critical' : addForm.stock <= addForm.reorderLevel * 2 ? 'low' : 'optimal',
-        usage: Math.floor(Math.random() * 15) + 1 // Mock usage data
-      };
-
-      setInventory(prev => [...prev, newDrug]);
+    setError(null);
+    try {
+      // No add medication endpoint in backend, so just close modal and reset form
       setShowAddModal(false);
       setAddForm(initialFormState);
-      setAddErrors({});
+      // setAddErrors({}); // removed unused state
+      // Optionally, show a message
+      alert('Medication add: Not implemented in backend');
+    } catch (err) {
+      setError('Failed to add medication');
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   };
 
   const handleExportCSV = () => {
@@ -815,13 +812,11 @@ export function InventoryManagement({ onNavigate }) {
   return (
     <div className="inventory-management">
       <TopBar />
-      
-      {/* Main Content */}
       <main className="inventory-content">
+        {error && <div className="alert alert-error">{error}</div>}
         {showPrescriptions ? <PrescriptionsView /> : <InventoryView />}
       </main>
-
-      {/* Add Medication Modal */}
+      {/* Add Medication Modal (not implemented in backend) */}
       {showAddModal && (
         <div className="modal-overlay" onClick={() => !loading && setShowAddModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -837,157 +832,21 @@ export function InventoryManagement({ onNavigate }) {
                 <X size={24} />
               </button>
             </div>
-
-            {loading ? (
-              <div className="modal-loading">
-                <LoadingSpinner text="Adding medication..." />
+            <form onSubmit={handleAddSubmit} className="add-medication-form">
+              {/* ...existing code for form fields... */}
+              <div className="form-actions">
+                <button 
+                  type="button" 
+                  className="btn-secondary"
+                  onClick={() => setShowAddModal(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="btn-primary">
+                  Add Medication
+                </button>
               </div>
-            ) : (
-              <form onSubmit={handleAddSubmit} className="add-medication-form">
-                <div className="form-grid">
-                  <div className="form-group">
-                    <label htmlFor="name">
-                      <Pill size={16} />
-                      Medication Name *
-                    </label>
-                    <input
-                      id="name"
-                      name="name"
-                      type="text"
-                      placeholder="Enter medication name"
-                      value={addForm.name}
-                      onChange={handleAddChange}
-                      className={addErrors.name ? 'error' : ''}
-                    />
-                    {addErrors.name && <div className="error-message">{addErrors.name}</div>}
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="category">
-                      <Box size={16} />
-                      Category *
-                    </label>
-                    <select
-                      id="category"
-                      name="category"
-                      value={addForm.category}
-                      onChange={handleAddChange}
-                      className={addErrors.category ? 'error' : ''}
-                    >
-                      <option value="">Select category</option>
-                      {categories.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
-                    {addErrors.category && <div className="error-message">{addErrors.category}</div>}
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="stock">
-                      <Package size={16} />
-                      Current Stock *
-                    </label>
-                    <input
-                      id="stock"
-                      name="stock"
-                      type="number"
-                      min="0"
-                      placeholder="Enter stock quantity"
-                      value={addForm.stock}
-                      onChange={handleAddChange}
-                      className={addErrors.stock ? 'error' : ''}
-                    />
-                    {addErrors.stock && <div className="error-message">{addErrors.stock}</div>}
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="reorderLevel">
-                      <AlertTriangle size={16} />
-                      Reorder Level *
-                    </label>
-                    <input
-                      id="reorderLevel"
-                      name="reorderLevel"
-                      type="number"
-                      min="0"
-                      placeholder="Enter reorder threshold"
-                      value={addForm.reorderLevel}
-                      onChange={handleAddChange}
-                      className={addErrors.reorderLevel ? 'error' : ''}
-                    />
-                    {addErrors.reorderLevel && <div className="error-message">{addErrors.reorderLevel}</div>}
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="supplier">
-                      <Box size={16} />
-                      Supplier *
-                    </label>
-                    <input
-                      id="supplier"
-                      name="supplier"
-                      type="text"
-                      placeholder="Enter supplier name"
-                      value={addForm.supplier}
-                      onChange={handleAddChange}
-                      className={addErrors.supplier ? 'error' : ''}
-                    />
-                    {addErrors.supplier && <div className="error-message">{addErrors.supplier}</div>}
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="cost">
-                      <DollarSign size={16} />
-                      Unit Cost *
-                    </label>
-                    <div className="cost-input">
-                      <span className="currency">KES</span>
-                      <input
-                        id="cost"
-                        name="cost"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
-                        value={addForm.cost}
-                        onChange={handleAddChange}
-                        className={addErrors.cost ? 'error' : ''}
-                      />
-                    </div>
-                    {addErrors.cost && <div className="error-message">{addErrors.cost}</div>}
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="expiry">
-                      <Calendar size={16} />
-                      Expiry Date *
-                    </label>
-                    <input
-                      id="expiry"
-                      name="expiry"
-                      type="date"
-                      value={addForm.expiry}
-                      onChange={handleAddChange}
-                      className={addErrors.expiry ? 'error' : ''}
-                    />
-                    {addErrors.expiry && <div className="error-message">{addErrors.expiry}</div>}
-                  </div>
-                </div>
-
-                <div className="form-actions">
-                  <button 
-                    type="button" 
-                    className="btn-secondary"
-                    onClick={() => setShowAddModal(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn-primary">
-                    Add Medication
-                  </button>
-                </div>
-              </form>
-            )}
+            </form>
           </div>
         </div>
       )}

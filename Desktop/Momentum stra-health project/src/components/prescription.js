@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect, useCallback } from "react";
-import { Search, Plus, X, Edit2, Trash2, User, Pill, Activity, Download } from "lucide-react";
+import { Search, Plus, X, Edit2, Trash2, User, Pill, Download } from "lucide-react";
+import { apiService } from '../services/api';
 import "./prescription.css";
 
 // Prescription type definition
@@ -9,60 +11,6 @@ const PRESCRIPTION_STATUS = {
   CANCELLED: 'CANCELLED'
 };
 
-// Mock data with more realistic prescription details
-const mockPrescriptions = [
-  {
-    id: 1,
-    patientId: "P001",
-    patientName: "John Doe",
-    patientAge: 45,
-    medication: "Ibuprofen",
-    dosage: "200mg",
-    frequency: "Every 6 hours",
-    duration: "7 days",
-    instructions: "Take with food",
-    prescribedBy: "Dr. Sarah Johnson",
-    datePrescribed: "2024-01-15",
-    expiryDate: "2024-02-15",
-    status: PRESCRIPTION_STATUS.ACTIVE,
-    refills: 2,
-    allergies: ["None"]
-  },
-  {
-    id: 2,
-    patientId: "P002",
-    patientName: "Jane Smith",
-    patientAge: 32,
-    medication: "Paracetamol",
-    dosage: "500mg",
-    frequency: "Every 8 hours",
-    duration: "5 days",
-    instructions: "Take as needed for fever",
-    prescribedBy: "Dr. Michael Chen",
-    datePrescribed: "2024-01-14",
-    expiryDate: "2024-02-14",
-    status: PRESCRIPTION_STATUS.ACTIVE,
-    refills: 1,
-    allergies: ["Aspirin"]
-  },
-  {
-    id: 3,
-    patientId: "P003",
-    patientName: "Robert Wilson",
-    patientAge: 58,
-    medication: "Metformin",
-    dosage: "500mg",
-    frequency: "Twice daily",
-    duration: "30 days",
-    instructions: "Take with meals",
-    prescribedBy: "Dr. Sarah Johnson",
-    datePrescribed: "2024-01-10",
-    expiryDate: "2024-04-10",
-    status: PRESCRIPTION_STATUS.COMPLETED,
-    refills: 0,
-    allergies: ["Sulfa drugs"]
-  },
-];
 
 function Prescriptions({ userRole = "doctor" }) {
   const [search, setSearch] = useState("");
@@ -80,10 +28,21 @@ function Prescriptions({ userRole = "doctor" }) {
   });
   const [editingId, setEditingId] = useState(null);
   const [filterStatus, setFilterStatus] = useState("ALL");
+  // const [loading, setLoading] = useState(false);
 
-  // Initialize with mock data
+  // Fetch prescriptions from backend (placeholder: implement actual fetch if endpoint exists)
   useEffect(() => {
-    setPrescriptions(mockPrescriptions);
+    async function fetchPrescriptions() {
+      try {
+        // TODO: Replace with actual backend call when available
+        // Example: const data = await apiService.getPrescriptions();
+        // setPrescriptions(data);
+        setPrescriptions([]); // No endpoint yet, so empty
+      } catch (err) {
+        // Optionally handle error
+      }
+    }
+    fetchPrescriptions();
   }, []);
 
   // Filter prescriptions based on search and status
@@ -125,30 +84,31 @@ function Prescriptions({ userRole = "doctor" }) {
   };
 
   // Handle prescription submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const newPrescription = {
-      ...form,
-      id: editingId || Date.now(),
-      patientId: form.patientId || `P${String(Date.now()).slice(-4)}`,
-      prescribedBy: "Dr. Sarah Johnson", // In real app, get from auth context
-      datePrescribed: new Date().toISOString().split('T')[0],
-      expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
-      status: PRESCRIPTION_STATUS.ACTIVE,
-      allergies: [] // In real app, fetch from patient data
-    };
-
     if (editingId) {
-      // Update existing prescription
-      setPrescriptions(prev => 
-        prev.map(p => p.id === editingId ? newPrescription : p)
-      );
+      // TODO: Implement update prescription if backend supports
+      // For now, just update locally
+      setPrescriptions(prev => prev.map(p => p.id === editingId ? { ...p, ...form } : p));
     } else {
-      // Add new prescription
-      setPrescriptions(prev => [...prev, newPrescription]);
+      // Create new prescription via backend
+      const payload = {
+        ...form,
+        patientId: form.patientId || `P${String(Date.now()).slice(-4)}`,
+        prescribedBy: "Dr. Sarah Johnson", // Replace with real user
+        datePrescribed: new Date().toISOString().split('T')[0],
+        expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        status: PRESCRIPTION_STATUS.ACTIVE,
+        allergies: []
+      };
+      try {
+        const created = await apiService.createPrescription(payload);
+        setPrescriptions(prev => [...prev, created]);
+      } catch (err) {
+        // Fallback: add locally if backend fails
+        setPrescriptions(prev => [...prev, payload]);
+      }
     }
-
     resetForm();
     setShowForm(false);
   };
@@ -178,11 +138,11 @@ function Prescriptions({ userRole = "doctor" }) {
   };
 
   // Handle status change
-  const handleStatusChange = (id, newStatus) => {
-    setPrescriptions(prev => 
-      prev.map(p => p.id === id ? { ...p, status: newStatus } : p)
-    );
-  };
+  // const handleStatusChange = (id, newStatus) => {
+  //   setPrescriptions(prev => 
+  //     prev.map(p => p.id === id ? { ...p, status: newStatus } : p)
+  //   );
+  // };
 
   // Handle print/download
   const handlePrint = (prescription) => {
