@@ -410,6 +410,11 @@
     width: 100%;
     justify-content: center;
   }
+  /* Responsive select option styles for tablets */
+  select, option {
+    font-size: 0.95rem;
+    padding: 0.5rem 0.75rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -449,5 +454,10 @@
   
   .prescriptions-container {
     padding: 20px;
+  }
+  /* Responsive select option styles for mobile */
+  select, option {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.5rem;
   }
 }

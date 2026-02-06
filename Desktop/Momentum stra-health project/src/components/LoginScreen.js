@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { User as UserIcon, Eye, EyeOff, ChevronDown } from 'lucide-react';
+import CustomRoleSelect from './CustomRoleSelect';
+import { User as UserIcon, Eye, EyeOff } from 'lucide-react';
 import './LoginScreen.css';
 import { apiService } from '../services/api';
 
@@ -109,22 +110,16 @@ export function LoginScreen({ onLogin, devMode }) {
             {/* Role Dropdown */}
             <div>
               <div className="input-container">
-                  <div>
-                    <UserIcon className="input-icon" />
-                  </div>
-                  <select
+                <div>
+                  <UserIcon className="input-icon" />
+                </div>
+                <div style={{ width: '100%' }}>
+                  <CustomRoleSelect
                     value={selectedRole}
-                    onChange={(e) => setSelectedRole(e.target.value)}
-                    className="form-input"
-                    style={{ appearance: 'none', cursor: 'pointer', paddingRight: '2.5rem' }}
-                  >
-                    {Object.entries(roleLabels).map(([role, label]) => (
-                      <option key={role} value={role}>{label}</option>
-                    ))}
-                  </select>
-                  <div style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', display: 'flex', alignItems: 'center', height: '100%' }}>
-                    <ChevronDown className="input-icon" style={{ color: '#9ca3af', width: '1.25rem', height: '1.25rem' }} />
-                  </div>
+                    onChange={setSelectedRole}
+                    options={Object.entries(roleLabels).map(([role, label]) => ({ value: role, label }))}
+                  />
+                </div>
               </div>
             </div>
 
