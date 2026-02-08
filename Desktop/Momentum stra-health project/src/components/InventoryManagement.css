@@ -1384,3 +1384,6 @@
     font-size: 24px;
   }
 }
+svg.search-icon {
+  display: none !important; /* Adding !important to ensure it overrides other styles */
+}

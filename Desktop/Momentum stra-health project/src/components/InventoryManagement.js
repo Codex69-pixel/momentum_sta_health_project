@@ -11,7 +11,7 @@ import './InventoryManagement.css';
 import Prescriptions from './prescription';
 
 
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 
 const categories = ['Pain Relief', 'Antibiotics', 'Cardiovascular', 'Diabetes', 'Hypertension', 'GI Disorders'];
 

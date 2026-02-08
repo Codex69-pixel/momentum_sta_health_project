@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import CustomRoleSelect from './CustomRoleSelect';
 import { User as UserIcon, Eye, EyeOff } from 'lucide-react';
 import './LoginScreen.css';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 
 export function LoginScreen({ onLogin, devMode }) {
   const [username, setUsername] = useState('');

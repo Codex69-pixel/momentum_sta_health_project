@@ -10,7 +10,7 @@ import LoadingSpinner from './common/LoadingSpinner';
 // import TablePagination from './common/TablePagination';
 
 
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 
 const urgencyConfig = {
   RED: {

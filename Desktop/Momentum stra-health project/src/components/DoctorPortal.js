@@ -7,7 +7,7 @@ import {
 import './DoctorPortal.css';
 import LoadingSpinner from './common/LoadingSpinner';
 import Prescriptions from './prescription';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 
 
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import NotificationButton from './common/NotificationButton';
 import { User, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
 import { logout } from '../utils/logout';
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 import LoadingSpinner from './common/LoadingSpinner';
 
 export function ResourceDashboard({ onNavigate }) {

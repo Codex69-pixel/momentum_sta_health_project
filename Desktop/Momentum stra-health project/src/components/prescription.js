@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Search, Plus, X, Edit2, Trash2, User, Pill, Download } from "lucide-react";
-import { apiService } from '../services/api';
+import apiService from '../services/api';
 import "./prescription.css";
 
 // Prescription type definition
