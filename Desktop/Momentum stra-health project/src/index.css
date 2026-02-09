@@ -1075,10 +1075,7 @@ td {
   outline: none;
 }
 
-.btn:focus-visible {
-  ring: 4px;
-  ring-color: var(--primary-200);
-}
+/* .btn:focus-visible intentionally left blank or add focus styles if needed */
 
 .btn-primary {
   background: linear-gradient(135deg, var(--primary-600), var(--primary-700));

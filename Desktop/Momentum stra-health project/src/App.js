@@ -13,7 +13,7 @@ const DEV_MODE = true;
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState('login');
   const [user, setUser] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Removed unused sidebarOpen state
 
   const handleLogin = (userData) => {
     setUser(userData);
@@ -28,10 +28,7 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    setCurrentScreen('login');
-  };
+  // Removed unused handleLogout function
 
   if (currentScreen === 'login' || !user) {
     return <LoginScreen onLogin={handleLogin} devMode={DEV_MODE} />;

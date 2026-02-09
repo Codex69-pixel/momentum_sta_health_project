@@ -3,7 +3,7 @@ import NotificationButton from './common/NotificationButton';
 import { 
   User, ChevronDown, LogOut, Package, Plus, 
   AlertTriangle, CheckCircle, Clock, TrendingUp, Search, 
-  Download, Pill, MoreVertical, AlertCircle, ShoppingCart, X, FileText
+  Pill, MoreVertical, AlertCircle, ShoppingCart, X, FileText
 } from 'lucide-react';
 // import LoadingSpinner from './common/LoadingSpinner';
 import Papa from 'papaparse';
@@ -260,33 +260,7 @@ export function InventoryManagement({ onNavigate }) {
     }
   };
 
-  const handleExportCSV = () => {
-    const csvData = filteredDrugs.map(drug => ({
-      'Medication ID': `MED-${String(drug.id).padStart(4, '0')}`,
-      Name: drug.name,
-      Category: drug.category,
-      Stock: drug.stock,
-      'Prescription Count': drug.prescriptionCount || 0,
-      'Total Prescribed': drug.totalPrescribed || 0,
-      'Reorder Level': drug.reorderLevel,
-      'Usage/Day': drug.usage,
-      Supplier: drug.supplier,
-      'Unit Cost': `KES ${drug.cost.toFixed(2)}`,
-      Expiry: drug.expiry,
-      Status: drug.status.charAt(0).toUpperCase() + drug.status.slice(1)
-    }));
-
-    const csv = Papa.unparse(csvData);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `inventory-export-${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
+  // Removed unused handleExportCSV function
 
   const handleSort = (key) => {
     if (sortKey === key) {
