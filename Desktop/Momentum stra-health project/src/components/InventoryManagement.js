@@ -546,17 +546,6 @@ export function InventoryManagement({ onNavigate }) {
               </button>
             ))}
           </div>
-
-          <div className="action-buttons">
-            <button className="action-btn secondary" onClick={handleExportCSV}>
-              <Download size={18} />
-              <span>Export CSV</span>
-            </button>
-            <button className="action-btn primary" onClick={() => setShowAddModal(true)}>
-              <Plus size={18} />
-              <span>Add Medication</span>
-            </button>
-          </div>
         </div>
       </div>
 
